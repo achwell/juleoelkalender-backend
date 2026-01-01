@@ -1,0 +1,440 @@
+{
+  "pages" : {
+    "403" : {
+      "header" : "You do not have access"
+    },
+    "404" : {
+      "header" : "Could not find what you requested"
+    },
+    "addtoken" : {
+      "addtoken" : "Add token",
+      "email" : "Email",
+      "hasuserlogin" : "Log in if you have a user",
+      "header" : "Add Token",
+      "token" : "Token"
+    },
+    "beeradmin" : {
+      "beername" : "Beer name",
+      "calendar" : "Calendar",
+      "dayincalendar" : "Date in calendar",
+      "excelexportfilename" : "allbeers.xlsx",
+      "header" : "All beers",
+      "year" : "Year"
+    },
+    "beeredit" : {
+      "addbeer" : "Add beer",
+      "editbeer" : "Edit beer"
+    },
+    "beerreview" : {
+      "header" : "Reviews",
+      "ingress" : "The results are weighted approximately the same as Norbrygg's",
+      "ingresslinktext" : "judging scheme",
+      "ingress2" : ", but with the addition of label.",
+      "excelexportfilename" : "reviews.xlsx"
+    },
+    "beers" : {
+      "header" : "My beers",
+      "addbeer" : "Add new beer"
+    },
+    "beerstyles" : {
+      "add" : "New style",
+      "beerstyle" : "Style",
+      "beerstylemustbeunique" : "Style must be unique",
+      "edit" : "Edit style",
+      "header" : "Beer styles"
+    },
+    "calendar" : {
+      "header" : "Calendars",
+      "subheader" : "My calendar",
+      "paragraph1" : "Here you see an overview of your calendars and beer(s).",
+      "admin" : {
+        "active" : "Active",
+        "addcalendar" : "Add calendar",
+        "archived" : "Archived",
+        "beerremove" : "Do ypou want to remove {{beer}} from calendar {{year}}: {{calendar}}",
+        "beerremoved" : "{{beer}} removed from calendar {{year}}: {{calendar}}",
+        "calendar" : "Calendar",
+        "header" : "Manage {{year}} : {{calendar}}",
+        "subheader" : "Overview of contributions in calendar {{calendar}} as well as the option to add beer",
+        "hidden" : "Sidden",
+        "ingress" : "You are an administrator and can edit calendars and choose which beers are included",
+        "published" : "Published",
+        "visible" : "Visible",
+        "ispublished" : "Is Puublished",
+        "isarchived" : "Is archived",
+        "year" : "Year",
+        "itsalreadyabeeronday" : "It's already a beer on day {{day}}",
+        "beeradded" : "Beer added to calendar {{year}}: {{calendar}} on {{day}}.",
+        "addbeer" : "Add beer",
+        "addbeermodal" : {
+          "choosebeer" : "Choose beer",
+          "day" : "Day",
+          "ingress" : "All beers that do not have a calendar are listed here. You can choose the beer and which day it will appear on the given calendar.",
+          "itsalreadyabeeronthisday" : "There is already a beer on this day",
+          "title" : "Add beer to calendar",
+          "wantdate" : "(Desire december {{desiredDate}}.)"
+        }
+      },
+      "review" : {
+        "ingress" : "The results are weighted approximately the same as Norbrygg's",
+        "ingresslinktext" : "judging scheme",
+        "ingress2" : ", but with the addition of label.",
+        "addvote" : "Cast your vote",
+        "editvote" : "Edit your vote",
+        "vote" : "Vote"
+      }
+    },
+    "calendarview" : {
+      "header" : "Calendar",
+      "headercreate" : "Create calendar",
+      "headerupdate" : "Edit calendar",
+      "subheader" : "Welcome to calendar {{name}} : {{year}}",
+      "ingress" : "Here you can see all the beers and vote for the ones you've tasted!",
+      "beer" : {
+        "day" : "Day",
+        "details" : "Details",
+        "name" : "Name"
+      }
+    },
+    "dashboard" : {
+      "backend" : "Backend",
+      "cpuload" : "CPU load",
+      "database" : "Database",
+      "email" : "Email",
+      "freedisk" : "Free disk",
+      "freememory" : "Free memory",
+      "header" : "Admin Dashboard",
+      "uptime" : "Uptime",
+      "beers" : {
+        "freecallendardays" : "Number of free calendar days this year",
+        "newest" : "Newest beer",
+        "newestcreated" : "Newest beer added",
+        "total" : "Number of active beers this year",
+        "unplaced" : "Number of unplaced beers this year"
+      },
+      "charts" : {
+        "browser" : "Browser",
+        "calls" : "Call to Backend",
+        "desktop" : "Desktop",
+        "mobile" : "Mobile",
+        "os" : "Operating system",
+        "platform" : "Platform"
+      },
+      "users" : {
+        "activecount" : "Number of active users",
+        "count" : "Number of users",
+        "newest" : "Newest user",
+        "newestactive" : "Newest active user",
+        "newestcreated" : "Newest user created"
+      },
+      "versions" : {
+        "backend" : "Backend version",
+        "backendbuilt" : "Backend built",
+        "frontend" : "Frontend version"
+      }
+    },
+    "forgottenpassword" : {
+      "confirmpassword" : "Confirm password",
+      "email" : "Email",
+      "forgottenpassword" : "Forgotten password",
+      "hasuserlogin" : "Log in if you have a user",
+      "invalidtoken" : "Invalid token",
+      "password" : "Password",
+      "setnewpassword" : "Set new password",
+      "title" : "Forgotten password",
+      "token" : "Token",
+      "usernotregistered" : "The user is not registered",
+      "successmessage" : "Password updated for {{name}}"
+    },
+    "home" : {
+      "header" : "Hello, {{name}}!",
+      "subheader" : "Welcome to Juleølkalenderen!",
+      "paragraph1" : "The first you have to do is to register your beer(s)",
+      "here" : "here",
+      "paragraph2" : "Then an administrator will start adding beers to calendars. You can see the",
+      "calendaroverview" : "calendar overview",
+      "paragraph3" : "to see where your beer(s) are placed",
+      "paragraph4" : "When all beers are placed are we ready for the best month of the year! Voting is always open, so you can jumpstart, or drink in your own speed. But the result of the votes will not be presented until we have passed desember 24."
+    },
+    "login" : {
+      "email" : "Email",
+      "forgottenpassword" : "Forgotten password",
+      "header" : "Log in",
+      "login" : "Log in",
+      "password" : "Password",
+      "register" : "Register",
+      "invalidTokenReceived" : "Invalid Token received!",
+      "unknownerror" : "Ukjent feil"
+    },
+    "logout" : {
+      "header" : "Logging out..."
+    },
+    "register" : {
+      "area" : "Area",
+      "areacomment" : "The area is used to be able to help members with car sharing on the exchange day",
+      "buttonlogin" : "Log in if you have a user",
+      "buttonregister" : "Register",
+      "buttonregistering" : "Registering...",
+      "confirmpassword" : "Confirm password",
+      "confirmpasswordlabel" : "Confirm password (8 - 32 characters)",
+      "email" : "Email",
+      "header" : "Register",
+      "subheader" : "If you are missing a token, contact",
+      "firstName" : "First name",
+      "middleName" : "Middle name",
+      "lastName" : "Last name",
+      "password" : "Password",
+      "passwordlabel" : "Password (8 - 32 characters)",
+      "token" : "Token",
+      "user" : "User"
+    },
+    "totalreviews" : {
+      "header" : "Reviews",
+      "ingress" : "The results are weighted approximately the same as Norbrygg's",
+      "ingresslinktext" : "judging scheme",
+      "ingress2" : ", but with the addition of label.",
+      "calendar" : {
+        "beer" : "Beer",
+        "calendar" : "Calendar",
+        "year" : "Year"
+      }
+    },
+    "tokens" : {
+      "active" : "Active",
+      "add" : "Add token",
+      "archived" : "Archived",
+      "edit" : "Edit token",
+      "header" : "Tokens",
+      "name" : "Name",
+      "token" : "Token",
+      "tokenmustbeunique" : "Token must be unique"
+    },
+    "user" : {
+      "area" : "Area",
+      "areacomment" : "The area is used to be able to help members with car sharing on the exchange day",
+      "changepasswordcomment" : "To change your password, fill in both Password and Confirm Password",
+      "confirmpassword" : "Cconfirm password",
+      "email" : "Email",
+      "emailinuse" : "This email address is already in use",
+      "header" : "My page",
+      "locked" : "Locked",
+      "firstName" : "First name",
+      "middleName" : "Middle name",
+      "lastName" : "Last name",
+      "password" : "Password",
+      "role" : "Role",
+      "token" : "Token",
+      "tab" : {
+        "mybeers" : "My beers",
+        "mycalendars" : "My calendars",
+        "userdata" : "Userdata"
+      }
+    },
+    "users" : {
+      "area" : "Area",
+      "created" : "Created",
+      "email" : "Email",
+      "header" : "All users",
+      "lastlogin" : "Last login",
+      "name" : "Name",
+      "numberofbeers" : "Number og beers",
+      "role" : "Role",
+      "user" : "User",
+      "unlockuser" : "Unlock user",
+      "wasunlocked" : "{{name}} was unlocked",
+      "users" : "brukere.xlsx"
+    }
+  },
+  "buttons" : {
+    "add" : "Create {{field}}",
+    "back" : "Back",
+    "cancel" : "Cancel",
+    "creating" : "Creating...",
+    "delete" : "Delete!",
+    "details" : "Details",
+    "edit" : "Edit",
+    "excel" : "Excel",
+    "ok" : "OK",
+    "login" : "Log in",
+    "move" : {
+      "down" : "Move down",
+      "up" : "Move up"
+    },
+    "password" : "Password",
+    "register" : "Register",
+    "reviews" : "Reviews",
+    "save" : "Save",
+    "saving" : "Saving...",
+    "submit" : "Submit",
+    "view" : "View",
+    "unlock" : "Unlock",
+    "updating" : "Updating..."
+  },
+  "common" : {
+    "dateformat" : "yyyy-dd.MM",
+    "no" : "No",
+    "yes" : "Yes",
+    "max" : "Max",
+    "min" : "Min"
+  },
+  "add" : {
+    "added" : "{{field}} was added",
+    "error" : "Could not create {{field}}"
+  },
+  "delete" : {
+    "confirmdelete" : "Do you want to delete {{name}}?",
+    "confirmdeletetext" : "Are you sure you want to delete {{name}}?",
+    "confirmdeletebutton" : "Do you want to delete {{name}}?",
+    "confirmdeletemessage" : "Yes, delete {{name}}",
+    "delete" : "Delete {{name}}",
+    "deleted" : "{{name}} was deleted",
+    "deleting" : "Deleting...",
+    "error" : "Error deleting {{name}}"
+  },
+  "role" : {
+    "user" : "Brewer",
+    "admin" : "Administrator",
+    "master" : "System administrator"
+  },
+  "time" : {
+    "short" : {
+      "second" : "s",
+      "minute" : "m",
+      "hour" : "h",
+      "day" : "d"
+    }
+  },
+  "update" : {
+    "updated" : "{{field}} was updated",
+    "error" : "Could not update {{field}}"
+  },
+  "validation" : {
+    "email" : "Invalid email",
+    "invalid" : "{{field}} is invalid",
+    "maxcharacters" : "{{field}} can not be more than {{number}} characters",
+    "mincharacters" : "{{field}} must be at least {{number}} characters",
+    "maxvalue" : "{{field}} can not be higher than {{number}}",
+    "minvalue" : "{{field}} can not be lavere than {{number}}",
+    "passwordsdontmatch" : "Passwords don't match",
+    "positive" : "Must be a positive number",
+    "required" : "{{field}} is required"
+  },
+  "beer" : {
+    "abv" : "Abv",
+    "archived" : "Archived",
+    "bottledate" : "Bottled date",
+    "breweddate" : "Brewed date",
+    "brewer" : "Brewer",
+    "createdDate" : "Created",
+    "description" : "Description",
+    "desiredDate" : "Desired date in calendar",
+    "ebc" : "Ebc",
+    "ibu" : "Ibu",
+    "name" : "Name",
+    "recipe" : "Recipe",
+    "style" : "Style",
+    "untapped" : "Untapped"
+  },
+  "calendarform" : {
+    "combinationExists" : "There is already a calendar with this combination of name and year",
+    "combinationExistsNameYear" : "There is already a calendar named {{name}} for {{year}}",
+    "archived" : "Archived",
+    "name" : "Name",
+    "published" : "Published",
+    "year" : "Year",
+    "confirmdelete" : "Do you want to delete {{year}}: {{name}}?",
+    "confirmdeletetext" : "Are you sure you want to {{name}} from {{year}}?",
+    "created" : "Calendar {{name}} created",
+    "deleted" : "Calendar {{year}}: {{name}} deleted",
+    "updated" : "Calendar {{name}} updated"
+  },
+  "beerform" : {
+    "recipelink" : "Link to recipe",
+    "untappedlink" : "Link to UnTapped"
+  },
+  "menu" : {
+    "allbeers" : "All beers",
+    "beerstyles" : "Beer styles",
+    "calendars" : "Calendars",
+    "dashboard" : "Dashboard",
+    "home" : "Home",
+    "logout" : "Log out",
+    "mybeers" : "My beers",
+    "mypage" : "Me",
+    "reviews" : "Reviews",
+    "token" : "Token",
+    "users" : "Users"
+  },
+  "mybeerstable" : {
+    "active" : "Active",
+    "archived" : "Archived",
+    "desiredday" : "Desired date in calendar",
+    "details" : "Details",
+    "name" : "Name",
+    "reviews" : "Reviews",
+    "style" : "Style"
+  },
+  "mycalendarstable" : {
+    "beername" : "Beer",
+    "calendar" : "Calendar",
+    "dayincalendar" : "Date in calendar",
+    "desiredday" : "Desired date in calendar",
+    "viewallbeers" : "View all beers",
+    "year" : "Year"
+  },
+  "rating" : {
+    "comments" : "Comments",
+    "feel" : "Feel",
+    "label" : "Label",
+    "looks" : "Looks",
+    "overall" : "Overall",
+    "max" : "Max {{number}}",
+    "smell" : "Smell",
+    "taste" : "Taste",
+    "total" : "Total"
+  },
+  "ratingtable" : {
+    "average" : {
+      "calendar" : "Average for calendar",
+      "yourbeer" : "Average for your beer"
+    }
+  },
+  "review" : {
+    "createdAt" : "Created"
+  },
+  "reviewtable" : {
+    "comments" : "Comments"
+  },
+  "table" : {
+    "norowstoshow" : "No Rows To Show",
+    "search" : "Search...",
+    "filter" : {
+      "all" : "All"
+    },
+    "pagination" : {
+      "first" : "First",
+      "previous" : "Previous",
+      "next" : "Next",
+      "last" : "Last",
+      "rowsperpage" : "Rows per page",
+      "showingresults" : "Showing {{firstRow}} to {{lastRow}} of {{rowCount}} results"
+    }
+  },
+  "todaysbeer" : {
+    "beer" : "Beer",
+    "calendar" : "Calendar",
+    "todaysbeer" : "Todays beer"
+  },
+  "status" : {
+    "down" : "Down",
+    "outofservice" : "Out of service",
+    "unknown" : "Unknown",
+    "up" : "Up"
+  },
+  "usersTable" : {
+    "show" : {
+      "active" : "Show active only",
+      "all" : "Show all"
+    }
+  }
+}

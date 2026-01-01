@@ -1,0 +1,440 @@
+{
+  "pages" : {
+    "403" : {
+      "header" : "Du har ikke tilgang"
+    },
+    "404" : {
+      "header" : "Kunne ikke finne det du ba om"
+    },
+    "addtoken" : {
+      "addtoken" : "Legg til token",
+      "email" : "E-post",
+      "hasuserlogin" : "Logg inn om du har en bruker",
+      "header" : "Legg til Token",
+      "token" : "Token"
+    },
+    "beeradmin" : {
+      "beername" : "Ølnavn",
+      "calendar" : "Kalender",
+      "dayincalendar" : "Dag i kalender",
+      "excelexportfilename" : "alleoel.xlsx",
+      "header" : "Alle øl",
+      "year" : "År"
+    },
+    "beeredit" : {
+      "addbeer" : "Legg til øl",
+      "editbeer" : "Rediger øl"
+    },
+    "beerreview" : {
+      "header" : "Tilbakemeldinger",
+      "ingress" : "Resultatene vektes tilnærmet likt Norbryggs",
+      "ingresslinktext" : "dommerskjema",
+      "ingress2" : ", men med tillegg av etikett.",
+      "excelexportfilename" : "tilbakemeldinger.xlsx"
+    },
+    "beers" : {
+      "header" : "Mine øl",
+      "addbeer" : "Legg til ny øl"
+    },
+    "beerstyles" : {
+      "add" : "Ny stil",
+      "beerstyle" : "Stil",
+      "beerstylemustbeunique" : "Stil må være unik",
+      "edit" : "Rediger stil",
+      "header" : "Ølstiler"
+    },
+    "calendar" : {
+      "header" : "Kalendere",
+      "subheader" : "Mine kalendere",
+      "paragraph1" : "Her ser du en oversikt over dine kalendere og øl.",
+      "admin" : {
+        "active" : "Aktiv",
+        "addcalendar" : "Lag ny kalender",
+        "archived" : "Arkivert",
+        "beerremove" : "Er du sikker på at du vil fjerne {{beer}} fjernet fra kalender {{year}}: {{calendar}}",
+        "beerremoved" : "{{beer}} fjernet fra kalender {{year}}: {{calendar}}",
+        "calendar" : "Kalender",
+        "header" : "Administrere {{year}} : {{calendar}}",
+        "subheader" : "Oversikt over bidrag i kalender {{calendar}} samt muligheten til å legge til øl",
+        "hidden" : "Skjult",
+        "ingress" : "Du er en administrator og kan redigere kalendere og hvilke øl som er med",
+        "published" : "Publisert",
+        "visible" : "Synlig",
+        "ispublished" : "Er Publisert",
+        "isarchived" : "Er arkivert",
+        "year" : "År",
+        "itsalreadyabeeronday" : "Det er allerede en øl på dag {{day}}",
+        "beeradded" : "Øl lagt til kalender {{year}}: {{calendar}} den {{day}}.",
+        "addbeer" : "Legg til øl",
+        "addbeermodal" : {
+          "choosebeer" : "Velg øl",
+          "day" : "Dag",
+          "ingress" : "Her listes alle øl som ikke har en kalender. Du kan velge øl og hvilken dag den skal komme på i den gitte kalenderen.",
+          "itsalreadyabeeronthisday" : "Det er allerede en øl på denne dagen",
+          "title" : "Legg øl til i kalender",
+          "wantdate" : "(Ønsker {{desiredDate}}. desember)"
+        }
+      },
+      "review" : {
+        "ingress" : "Resultatene vektes tilnærmet likt Norbryggs",
+        "ingresslinktext" : "dommerskjema",
+        "ingress2" : ", men med tillegg av etikett.",
+        "addvote" : "Gi stemme",
+        "editvote" : "Endre stemme",
+        "vote" : "Stemme"
+      }
+    },
+    "calendarview" : {
+      "header" : "Kalender",
+      "headercreate" : "Legg til kalender",
+      "headerupdate" : "Rediger kalender",
+      "subheader" : "Velkommen til kalender {{name}} : {{year}}",
+      "ingress" : "Her kan du se alle øl og stemme på dem du har smakt!",
+      "beer" : {
+        "day" : "Dag",
+        "details" : "Detaljer",
+        "name" : "Navn"
+      }
+    },
+    "dashboard" : {
+      "backend" : "Backend",
+      "cpuload" : "CPU-last",
+      "database" : "Database",
+      "email" : "E-post",
+      "freedisk" : "Ledig disk",
+      "freememory" : "Ledig minne",
+      "header" : "Administrasjonskontrollpanel",
+      "uptime" : "Oppetid",
+      "beers" : {
+        "freecallendardays" : "Antall ledige kalenderplasser i år",
+        "newest" : "Nyeste øl",
+        "newestcreated" : "Nyeste øl opprettet",
+        "total" : "Antall aktive øl i år",
+        "unplaced" : "Antall uplasserte øl i år"
+      },
+      "charts" : {
+        "browser" : "Nettleser",
+        "calls" : "Kall til Backend",
+        "desktop" : "Desktop",
+        "mobile" : "Mobil",
+        "os" : "Operativsystem",
+        "platform" : "Platform"
+      },
+      "users" : {
+        "activecount" : "Antall aktive brukere",
+        "count" : "Antall brukere",
+        "newest" : "Nyeste bruker",
+        "newestactive" : "Nyeste aktive bruker",
+        "newestcreated" : "Nyeste bruker opprettet"
+      },
+      "versions" : {
+        "backend" : "Backend-versjon",
+        "backendbuilt" : "Backend bygget",
+        "frontend" : "Frontend-versjon"
+      }
+    },
+    "forgottenpassword" : {
+      "confirmpassword" : "Bekreft passord",
+      "email" : "E-post",
+      "forgottenpassword" : "Glemt passord",
+      "hasuserlogin" : "Logg inn om du har en bruker",
+      "invalidtoken" : "Ugyldig token",
+      "password" : "Passord",
+      "setnewpassword" : "Sett nytt passord",
+      "title" : "Glemt passord",
+      "token" : "Token",
+      "usernotregistered" : "Brukeren er ikke registrert",
+      "successmessage" : "Passord oppdatert for {{name}}"
+    },
+    "home" : {
+      "header" : "Hei, {{name}}!",
+      "subheader" : "Velkommen til Juleølkalenderen!",
+      "paragraph1" : "Det første du må gjøre er å registrere din(e) øl. Det gjør du",
+      "here" : "her",
+      "paragraph2" : "Deretter vil en administrator begynne arbeidet med å legge din øl ti i en kalender. Du kan se på",
+      "calendaroverview" : "kalenderoversikten",
+      "paragraph3" : "for å se hvor din(e) øl er plassert",
+      "paragraph4" : "Når alle øl er registrert og plassert er vi klare for årets beste måned! Stemmeavgivning er åpent alltid, slik at du kan tjuvstarte, eller drikke i eget tempo. Men vi avventer resultater til vi er forbi 24. desember!"
+    },
+    "login" : {
+      "email" : "E-post",
+      "forgottenpassword" : "Glemt passord",
+      "header" : "Logg inn",
+      "login" : "Logg inn",
+      "password" : "Passord",
+      "register" : "Registrer deg",
+      "invalidTokenReceived" : "Ugyldig Token!",
+      "unknownerror" : "Ukjent feil"
+    },
+    "logout" : {
+      "header" : "Logger ut..."
+    },
+    "register" : {
+      "area" : "Område",
+      "areacomment" : "Område brukes for å kunne hjelpe medlemmer med samkjøring på byttedagen",
+      "buttonlogin" : "Logg inn om du har en bruker",
+      "buttonregister" : "Registrer",
+      "buttonregistering" : "Registrer...",
+      "confirmpassword" : "Bekreft passord",
+      "confirmpasswordlabel" : "Bekreft Passord (8 - 32 tegn)",
+      "email" : "E-post",
+      "header" : "Registrer deg",
+      "subheader" : "Om du mangler token, kontakt",
+      "firstName" : "Fornavn",
+      "middleName" : "Mellomnavn",
+      "lastName" : "Etternavn",
+      "password" : "Passord",
+      "passwordlabel" : "Passord (8 - 32 tegn)",
+      "token" : "Token",
+      "user" : "Bruker"
+    },
+    "totalreviews" : {
+      "header" : "Tilbakemeldinger",
+      "ingress" : "Resultatene vektes tilnærmet likt Norbryggs",
+      "ingresslinktext" : "dommerskjema",
+      "ingress2" : ", men med tillegg av etikett.",
+      "calendar" : {
+        "beer" : "Øl",
+        "calendar" : "Kalender",
+        "year" : "År"
+      }
+    },
+    "tokens" : {
+      "active" : "Aktiv",
+      "add" : "Ny token",
+      "archived" : "Arkivert",
+      "edit" : "Rediger token",
+      "header" : "Tokens",
+      "name" : "Navn",
+      "token" : "Token",
+      "tokenmustbeunique" : "Token må være unikt"
+    },
+    "user" : {
+      "area" : "Område",
+      "areacomment" : "Område brukes for å kunne hjelpe medlemmer med samkjøring på byttedagen",
+      "changepasswordcomment" : "For å bytte passord fyll ut både Passord og Bekreft Passord",
+      "confirmpassword" : "Bekreft passord",
+      "email" : "E-post",
+      "emailinuse" : "Denne e-postadressen er allerede i bruk",
+      "header" : "Min side",
+      "locked" : "Låst",
+      "firstName" : "Fornavn",
+      "middleName" : "Mellomnavn",
+      "lastName" : "Etternavn",
+      "password" : "Passord",
+      "role" : "Rolle",
+      "token" : "Token",
+      "tab" : {
+        "mybeers" : "Mine øl",
+        "mycalendars" : "Mine kalendere",
+        "userdata" : "Brukerdata"
+      }
+    },
+    "users" : {
+      "area" : "Område",
+      "created" : "Opprettet",
+      "email" : "E-post",
+      "header" : "Alle brukere",
+      "lastlogin" : "Sist pålogget",
+      "name" : "Navn",
+      "numberofbeers" : "Antall øl",
+      "role" : "Rolle",
+      "user" : "Bruker",
+      "unlockuser" : "Lås opp bruker",
+      "wasunlocked" : "{{name}} ble låst opp",
+      "excelexportfilename" : "brukere.xlsx"
+    }
+  },
+  "buttons" : {
+    "add" : "Lag ny {{field}}",
+    "back" : "Tilbake",
+    "cancel" : "Avbryt",
+    "creating" : "Oppretter...",
+    "delete" : "Slett!",
+    "details" : "Detaljer",
+    "edit" : "Rediger",
+    "excel" : "Excel",
+    "ok" : "OK",
+    "login" : "Logg inn",
+    "move" : {
+      "down" : "Flytt ned",
+      "up" : "Flytt opp"
+    },
+    "password" : "Passord",
+    "register" : "Registrer",
+    "reviews" : "Tilbakemeldinger",
+    "save" : "Lagre",
+    "saving" : "Lagrer...",
+    "submit" : "Send inn",
+    "view" : "Se",
+    "unlock" : "Lås opp",
+    "updating" : "Oppdaterer..."
+  },
+  "common" : {
+    "dateformat" : "dd.MM.yyyy",
+    "no" : "Nei",
+    "yes" : "Ja",
+    "max" : "Maks",
+    "min" : "Min"
+  },
+  "add" : {
+    "added" : "{{field}} ble lagt til",
+    "error" : "Kunne ikke opprette {{field}}"
+  },
+  "delete" : {
+    "confirmdelete" : "Vil du slette {{name}}?",
+    "confirmdeletetext" : "Er du sikker på at du vil fjerne {{name}}?",
+    "confirmdeletebutton" : "Vil du slette {{name}}?",
+    "confirmdeletemessage" : "Ja, slett {{name}}",
+    "delete" : "Slett {{name}}",
+    "deleted" : "{{name}} ble slettet",
+    "deleting" : "Sletter...",
+    "error" : "Kunne ikke slette {{name}}"
+  },
+  "role" : {
+    "user" : "Brygger",
+    "admin" : "Administrator",
+    "master" : "Systemadministrator"
+  },
+  "time" : {
+    "short" : {
+      "second" : "s",
+      "minute" : "m",
+      "hour" : "t",
+      "day" : "d"
+    }
+  },
+  "update" : {
+    "updated" : "{{field}} ble oppdatert",
+    "error" : "Kunne ikke oppdatere {{field}}"
+  },
+  "validation" : {
+    "email" : "Ugyldig e-post",
+    "invalid" : "{{field}} er ugyldig",
+    "maxcharacters" : "{{field}} kan ikke være mer enn {{number}} tegn",
+    "mincharacters" : "{{field}} må være minst {{number}} tegn",
+    "maxvalue" : "{{field}} kan ikke være høyere enn {{number}}",
+    "minvalue" : "{{field}} kan ikke være lavere enn {{number}}",
+    "passwordsdontmatch" : "Passordene er ikke like",
+    "positive" : "Må være et positivt tall",
+    "required" : "{{field}} er påkrevet"
+  },
+  "beer" : {
+    "abv" : "Abv",
+    "archived" : "Arkivert",
+    "bottledate" : "Tappedato",
+    "breweddate" : "Bryggedato",
+    "brewer" : "Brygger",
+    "createdDate" : "Opprettet",
+    "description" : "Beskrivelse",
+    "desiredDate" : "Ønsket dato i kalender",
+    "ebc" : "Ebc",
+    "ibu" : "Ibu",
+    "name" : "Navn",
+    "recipe" : "Oppskrift",
+    "style" : "Stil",
+    "untapped" : "Untapped"
+  },
+  "calendarform" : {
+    "combinationExists" : "Det er allerede en kalender med denne kombinasjonen av navn og år",
+    "combinationExistsNameYear" : "Det er allerede en kalender med navn {{name}} for {{year}}",
+    "archived" : "Arkivert",
+    "name" : "Navn",
+    "published" : "Publisert",
+    "year" : "År",
+    "confirmdelete" : "Vil du slette {{year}}: {{name}}?",
+    "confirmdeletetext" : "Er du sikker på at du vil fjerne {{name}} fra {{year}}?",
+    "created" : "Kalender {{name}} opprettet",
+    "deleted" : "Kalender {{year}}: {{name}} slettet",
+    "updated" : "Kalender {{name}} oppdatert"
+  },
+  "beerform" : {
+    "recipelink" : "Link til oppskrift",
+    "untappedlink" : "Link til UnTapped"
+  },
+  "menu" : {
+    "allbeers" : "Alle øl",
+    "beerstyles" : "Ølstiler",
+    "calendars" : "Kalendere",
+    "dashboard" : "Dashboard",
+    "home" : "Hjem",
+    "logout" : "Logg ut",
+    "mybeers" : "Mine øl",
+    "mypage" : "Min side",
+    "reviews" : "Tilbakemeldinger",
+    "token" : "Token",
+    "users" : "Brukere"
+  },
+  "mybeerstable" : {
+    "active" : "Aktiv",
+    "archived" : "Arkivert",
+    "desiredday" : "Ønsket dato i kalender",
+    "details" : "Detaljer",
+    "name" : "Navn",
+    "reviews" : "Tilbakemeldinger",
+    "style" : "Stil"
+  },
+  "mycalendarstable" : {
+    "beername" : "Øl",
+    "calendar" : "Kalender",
+    "dayincalendar" : "Dag i kalender",
+    "desiredday" : "Ønsket dato i kalender",
+    "viewallbeers" : "Se alle øl",
+    "year" : "År"
+  },
+  "rating" : {
+    "comments" : "Kommentar",
+    "feel" : "Følelse",
+    "label" : "Etikett",
+    "looks" : "Utseende",
+    "overall" : "Generelt",
+    "max" : "Maks {{number}}",
+    "smell" : "Lukt",
+    "taste" : "Smak",
+    "total" : "Total"
+  },
+  "ratingtable" : {
+    "average" : {
+      "calendar" : "Snitt kalender",
+      "yourbeer" : "Snitt ditt øl"
+    }
+  },
+  "review" : {
+    "createdAt" : "Opprettet"
+  },
+  "reviewtable" : {
+    "comments" : "Kommentarer"
+  },
+  "table" : {
+    "norowstoshow" : "Ingen rader å vise",
+    "search" : "Søk...",
+    "filter" : {
+      "all" : "Alle"
+    },
+    "pagination" : {
+      "first" : "Første",
+      "previous" : "Forrige",
+      "next" : "Neste",
+      "last" : "Siste",
+      "rowsperpage" : "Rader per side",
+      "showingresults" : "Viser {{firstRow}} til {{lastRow}} av {{rowCount}} rader"
+    }
+  },
+  "todaysbeer" : {
+    "beer" : "Øl",
+    "calendar" : "Kalender",
+    "todaysbeer" : "Dagens øl"
+  },
+  "status" : {
+    "down" : "Nede",
+    "outofservice" : "Ikke tilgjengelig",
+    "unknown" : "Ukjent",
+    "up" : "Oppe"
+  },
+  "usersTable" : {
+    "show" : {
+      "active" : "Vis bare aktive",
+      "all" : "Vis alle"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+UPDATE user SET image_silhouette = 0 WHERE image_silhouette IS NULL;

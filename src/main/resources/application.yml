@@ -1,0 +1,133 @@
+app:
+  locales:
+    missing: "."
+  jwt:
+    expiration_ms: 14400000
+    secret_key: IKKEBRUKIKKEBRUKIKKEBRUKIKKEBRUKIKKEBRUKIKKEBRUKIKKEBRUKIKKEBRUKIKKEBRUKIKKEBRUKIKKEBRUK
+  cors:
+    origins: http://localhost:3000,http://localhost:4173,http://localhost:5173,http://juleoelkalender.no,https://juleoelkalender.no
+  security:
+    debug:
+      # noinspection SpringBootApplicationYaml
+      enabled: true
+  server:
+    # noinspection SpringBootApplicationYaml
+    address: http://localhost:8080
+logging:
+  level:
+    org:
+      springframework: warn
+      flywaydb: DEBUG
+  file:
+    path: logs
+    name: juleoelkalender.log
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "httpexchanges,loggers,logfile,health,info,metrics"
+    migrate-legacy-ids: true
+    access:
+      default: unrestricted
+  endpoint:
+    health:
+      show-details: always
+    httpexchanges:
+      access: unrestricted
+    info:
+      access: unrestricted
+    loggers:
+      access: unrestricted
+    mail:
+      # noinspection SpringBootApplicationYaml
+      enabled: true
+    metrics:
+      access: unrestricted
+    shutdown:
+      access: none
+    flyway:
+      access: unrestricted
+    quartz:
+      access: unrestricted
+  health:
+    diskspace:
+      enabled: true
+    db:
+      enabled: true
+  httpexchanges:
+    recording:
+      include: response_headers,principal,remote_address,authorization_header,time_taken
+  info:
+    env:
+      enabled: true
+    build:
+      enabled: true
+    git:
+      enabled: true
+      mode: full
+    java:
+      enabled: true
+    os:
+      enabled: true
+spring:
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: default
+  datasource:
+    driver-class-name: org.h2.Driver
+    password: password
+    url: jdbc:h2:mem:testdb
+    username: sa
+  flyway:
+    enabled: false
+  jackson:
+    deserialization:
+      fail-on-null-for-primitives: false
+  jpa:
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: false
+  mail:
+    host: localhost
+    port: 8080
+    username: user
+    password: pass
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  main:
+    banner-mode: off
+  #  r2dbc:
+  #    url: r2dbc:h2:mem:testdb
+  #    name: sa
+  #    password: password
+  #    pool:
+  #      enabled: true
+  #      initial-size: 5
+  #      max-size: 10
+  sql:
+    init:
+      mode: always
+      platform: h2
+  profiles:
+    active: prod
+springdoc:
+  swagger-ui:
+    path: /v3/swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+    groups:
+      enabled: true
+    resolve-schema-properties: true
