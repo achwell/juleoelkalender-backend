@@ -1,0 +1,30 @@
+name: Maven Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build-and-sonar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      # 3) Build with Maven and run Sonar Scanner
+      - name: Build and analyze with Maven
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn clean verify sonar:sonar \
+          -Dsonar.host.url=${SONAR_HOST_URL} \
+          -Dsonar.login=${SONAR_TOKEN}
