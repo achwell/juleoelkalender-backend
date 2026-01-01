@@ -13,9 +13,9 @@
   <name>backend</name>
   <description>backend</description>
   <scm>
-    <connection>scm:git:ssh://git@bitbucket.org/achwell/jule-lkalender.git</connection>
-    <developerConnection>scm:git:ssh://git@bitbucket.org/achwell/jule-lkalender.git</developerConnection>
-    <url>git@bitbucket.org:achwell/jule-lkalender.git</url>
+    <connection>scm:git@github.com:achwell/juleoelkalender-backend.git</connection>
+    <developerConnection>scm:git@github.com:achwell/juleoelkalender-backend.git</developerConnection>
+    <url>git@github.com:achwell/juleoelkalender-backend.git</url>
     <tag>HEAD</tag>
   </scm>
   <properties>
@@ -29,7 +29,7 @@
     <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
     <maven-release-plugin-version>3.3.1</maven-release-plugin-version>
     <maven.version>3.8.8</maven.version>
-    <springdoc-openapi-starter-webmvc-ui.version>3.0.0</springdoc-openapi-starter-webmvc-ui.version>
+    <springdoc-openapi-starter-webmvc-ui.version>3.0.1</springdoc-openapi-starter-webmvc-ui.version>
     <jjwt.version>0.13.0</jjwt.version>
     <mockk-jvm.version>1.14.7</mockk-jvm.version>
     <poi.version>5.5.1</poi.version>
