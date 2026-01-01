@@ -23,6 +23,9 @@
     <java.version>25</java.version>
     <kotlin.jvmVersion>${java.version}</kotlin.jvmVersion>
     <kotlin.version>2.3.0</kotlin.version>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.projectKey>achwell</sonar.projectKey>
+    <sonar.organization>achwell</sonar.organization>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.source.skip>false</maven.source.skip>
     <maven.javadoc.skip>false</maven.javadoc.skip>
