@@ -13,9 +13,9 @@
   <name>backend</name>
   <description>backend</description>
   <scm>
-    <connection>scm:git@github.com:achwell/juleoelkalender-backend.git</connection>
-    <developerConnection>scm:git@github.com:achwell/juleoelkalender-backend.git</developerConnection>
-    <url>git@github.com:achwell/juleoelkalender-backend.git</url>
+    <connection>scm:git:https://github.com/achwell/juleoelkalender-backend.git</connection>
+    <developerConnection>scm:git:https://github.com/achwell/juleoelkalender-backend.git</developerConnection>
+    <url>https://github.com/achwell/juleoelkalender-backend</url>
     <tag>HEAD</tag>
   </scm>
   <properties>
