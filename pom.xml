@@ -9,14 +9,14 @@
   </parent>
   <groupId>no.juleoelkalender</groupId>
   <artifactId>juleoelkalender-backend</artifactId>
-  <version>1.1.25-SNAPSHOT</version>
+  <version>1.1.25</version>
   <name>backend</name>
   <description>backend</description>
   <scm>
     <connection>scm:git:https://github.com/achwell/juleoelkalender-backend.git</connection>
     <developerConnection>scm:git:https://github.com/achwell/juleoelkalender-backend.git</developerConnection>
     <url>https://github.com/achwell/juleoelkalender-backend</url>
-    <tag>HEAD</tag>
+    <tag>version/1.1.25</tag>
   </scm>
   <properties>
     <project.scm.id>juleoelkalender</project.scm.id>
