@@ -19,6 +19,6 @@ class DeviceMapper(private val userWithoutChildrenMapper: UserWithoutChildrenMap
             model.id, model.mobileVendor, model.mobileModel,
             model.isMobile, model.osName,
             model.osVersion, model.browserName, model.browserVersion,
-            userWithoutChildrenMapper.modelToEntity(model.user), ZonedDateTime.now(), null
+            userWithoutChildrenMapper.modelToEntity(model.user), ZonedDateTime.now(), ZonedDateTime.now()
     )
 }

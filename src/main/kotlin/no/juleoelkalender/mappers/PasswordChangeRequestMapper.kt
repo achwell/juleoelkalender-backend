@@ -3,6 +3,7 @@ package no.juleoelkalender.mappers
 import no.juleoelkalender.entity.PasswordChangeRequestEntity
 import no.juleoelkalender.model.PasswordChangeRequest
 import org.springframework.stereotype.Component
+import java.time.ZonedDateTime
 
 @Component
 class PasswordChangeRequestMapper : BaseMapper<PasswordChangeRequest, PasswordChangeRequestEntity> {
@@ -15,6 +16,6 @@ class PasswordChangeRequestMapper : BaseMapper<PasswordChangeRequest, PasswordCh
     override fun modelToEntity(model: PasswordChangeRequest): PasswordChangeRequestEntity = PasswordChangeRequestEntity(
             model.id,
             model.token, model.email,
-            model.created, null
+            model.created, ZonedDateTime.now()
     )
 }

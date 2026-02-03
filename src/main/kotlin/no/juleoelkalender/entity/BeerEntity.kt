@@ -24,11 +24,11 @@ open class BeerEntity(
         @Basic @Column(name = "untapped") var untapped: String?,
         @Basic @Column(name = "brewedDate", nullable = false) var brewedDate: @NotNull ZonedDateTime,
         @Basic @Column(name = "bottleDate", nullable = false) var bottleDate: @NotNull ZonedDateTime,
-        @Basic @Column(name = "archived", nullable = false) var archived: @NotNull Boolean,
+        @Basic @Column(name = "archived", nullable = false) var archived: @NotNull Boolean = false,
         @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "userId", referencedColumnName = "id", nullable = false) var user: @NotNull UserEntity,
         @OneToMany(mappedBy = "beer", fetch = FetchType.LAZY) var beerCalendars: MutableSet<BeerCalendarEntity>,
         @OneToMany(mappedBy = "beer", fetch = FetchType.LAZY) var reviews: MutableSet<ReviewEntity>,
         @CreationTimestamp(source = SourceType.DB) @Column(name = "createdAt", nullable = false, updatable = false) var createdDate: @NotNull ZonedDateTime,
-        @UpdateTimestamp(source = SourceType.DB) @Column(name = "updatedAt") var updatedDate: ZonedDateTime?,
+        @UpdateTimestamp(source = SourceType.DB) @Column(name = "updatedAt", nullable = false) var updatedDate: ZonedDateTime,
         @Column(name = "desired_date") var desiredDate: @Min(1) @Max(24) Int?
 )

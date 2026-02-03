@@ -3,6 +3,7 @@ package no.juleoelkalender.mappers
 import no.juleoelkalender.entity.ReviewEntity
 import no.juleoelkalender.model.Review
 import org.springframework.stereotype.Component
+import java.time.ZonedDateTime
 
 @Component
 class ReviewMapper(
@@ -25,7 +26,7 @@ class ReviewMapper(
         return ReviewEntity(
                 model.id!!, model.ratingLabel, model.ratingLooks,
                 model.ratingSmell, model.ratingTaste, model.ratingFeel,
-                model.ratingOverall, model.comment, model.createdAt, null,
+                model.ratingOverall, model.comment, model.createdAt, ZonedDateTime.now(),
                 beerMapper.modelToEntity(model.beer),
                 calendarMapper.modelToEntity(model.calendar),
                 userWithoutChildrenMapper.modelToEntity(model.user)

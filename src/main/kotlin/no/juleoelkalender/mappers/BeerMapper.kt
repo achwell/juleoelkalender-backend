@@ -5,6 +5,7 @@ import no.juleoelkalender.entity.ReviewEntity
 import no.juleoelkalender.model.Beer
 import no.juleoelkalender.model.ReviewWithoutChildren
 import org.springframework.stereotype.Component
+import java.time.ZonedDateTime
 
 @Component
 class BeerMapper(private val userWithoutChildrenMapper: UserWithoutChildrenMapper) : BaseMapper<Beer, BeerEntity> {
@@ -24,7 +25,7 @@ class BeerMapper(private val userWithoutChildrenMapper: UserWithoutChildrenMappe
             model.abv, model.ibu, model.ebc, model.recipe, model.untapped,
             model.brewedDate, model.bottleDate, model.archived,
             userWithoutChildrenMapper.modelToEntity(model.brewer), mutableSetOf(),
-            mutableSetOf(), model.createdDate, null,
+            mutableSetOf(), model.createdDate, ZonedDateTime.now(),
             model.desiredDate
     )
 

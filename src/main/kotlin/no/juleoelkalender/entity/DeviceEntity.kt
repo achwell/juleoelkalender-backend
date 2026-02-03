@@ -13,12 +13,12 @@ open class DeviceEntity(
         @Id @GeneratedValue(strategy = GenerationType.UUID) @Column(name = "id", updatable = false, nullable = false) var id: UUID,
         @Basic @Column var mobileVendor: String,
         @Basic @Column var mobileModel: String,
-        @Basic @Column var mobile: Boolean,
+        @Basic @Column(nullable = false) var mobile: Boolean = false,
         @Basic @Column var osName: String,
         @Basic @Column var osVersion: String,
         @Basic @Column var browserName: String,
         @Basic @Column var browserVersion: String,
         @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "userId", referencedColumnName = "id", nullable = false) var user: UserEntity,
-        @CreationTimestamp(source = SourceType.DB) @Column(name = "createdAt") var createdDate: ZonedDateTime,
-        @UpdateTimestamp(source = SourceType.DB) @Column(name = "updatedAt") var updatedDate: ZonedDateTime?
+        @CreationTimestamp(source = SourceType.DB) @Column(name = "createdAt", nullable = false) var createdDate: ZonedDateTime,
+        @UpdateTimestamp(source = SourceType.DB) @Column(name = "updatedAt", nullable = false) var updatedDate: ZonedDateTime
 )

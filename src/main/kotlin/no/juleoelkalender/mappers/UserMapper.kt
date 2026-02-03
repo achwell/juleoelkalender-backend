@@ -3,6 +3,7 @@ package no.juleoelkalender.mappers
 import no.juleoelkalender.entity.UserEntity
 import no.juleoelkalender.model.User
 import org.springframework.stereotype.Component
+import java.time.ZonedDateTime
 
 @Component
 class UserMapper(
@@ -28,7 +29,7 @@ class UserMapper(
             roleMapper.modelToEntity(model.role), model.locked,
             model.beers.map { beerMapper.modelToEntity(it) }.toMutableSet(), mutableSetOf(),
             model.calendarToken.map { calendarTokenMapper.modelToEntity(it) }.toMutableSet(),
-            mutableSetOf(), model.lastLoginDate, model.createdDate, null,
+            mutableSetOf(), model.lastLoginDate, model.createdDate, ZonedDateTime.now(),
             model.facebookUserId, model.imageUrl, model.imageHeight, model.imageWidth,
             model.imageSilhouette
     )

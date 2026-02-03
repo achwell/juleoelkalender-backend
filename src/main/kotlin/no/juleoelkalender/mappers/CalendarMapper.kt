@@ -17,7 +17,7 @@ class CalendarMapper(private val beerMapper: BeerMapper, private val calendarTok
     override fun modelToEntity(model: Calendar): CalendarEntity {
         return CalendarEntity(model.id, model.name, model.year, model.published, model.archived, model.beerCalendars.map {
             BeerCalendarEntity(it.id, it.day, beerMapper.modelToEntity(it.beer), calendarToCalendarEntity(it.calendar))
-        }.toMutableSet(), calendarTokenMapper.modelToEntity(model.calendarToken), mutableSetOf(), ZonedDateTime.now(), null)
+        }.toMutableSet(), calendarTokenMapper.modelToEntity(model.calendarToken), mutableSetOf(), ZonedDateTime.now(), ZonedDateTime.now())
     }
 
     private fun calendarEntityToCalendar(calendar: CalendarEntity): Calendar {
@@ -25,6 +25,6 @@ class CalendarMapper(private val beerMapper: BeerMapper, private val calendarTok
     }
 
     private fun calendarToCalendarEntity(calendar: Calendar): CalendarEntity {
-        return CalendarEntity(calendar.id, calendar.name, calendar.year, calendar.published, calendar.archived, mutableSetOf(), calendarTokenMapper.modelToEntity(calendar.calendarToken), mutableSetOf(), ZonedDateTime.now(), null)
+        return CalendarEntity(calendar.id, calendar.name, calendar.year, calendar.published, calendar.archived, mutableSetOf(), calendarTokenMapper.modelToEntity(calendar.calendarToken), mutableSetOf(), ZonedDateTime.now(), ZonedDateTime.now())
     }
 }

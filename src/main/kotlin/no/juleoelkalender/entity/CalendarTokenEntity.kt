@@ -13,9 +13,9 @@ open class CalendarTokenEntity(
         @Id @GeneratedValue(strategy = GenerationType.UUID) @Column(name = "id", updatable = false, nullable = false) var id: UUID,
         @Basic @Column(name = "token", nullable = false) var token: String,
         @Basic @Column(name = "name", nullable = false) var name: String,
-        @Basic @Column(name = "active", nullable = false) var active: Boolean,
+        @Basic @Column(name = "active", nullable = false) open var active: Boolean = false,
         @OneToMany(mappedBy = "calendarToken", fetch = FetchType.LAZY) var calendars: MutableSet<CalendarEntity>,
         @ManyToMany @JoinTable(name = "user_calendar_token", joinColumns = [JoinColumn(name = "calendar_token_id")], inverseJoinColumns = [JoinColumn(name = "user_id")]) var users: MutableSet<UserEntity>,
-        @CreationTimestamp(source = SourceType.DB) @Column(name = "createdAt") var createdDate: ZonedDateTime,
-        @UpdateTimestamp(source = SourceType.DB) @Column(name = "updatedAt") var updatedDate: ZonedDateTime?
+        @CreationTimestamp(source = SourceType.DB) @Column(name = "createdAt", nullable = false) var createdDate: ZonedDateTime,
+        @UpdateTimestamp(source = SourceType.DB) @Column(name = "updatedAt", nullable = false) var updatedDate: ZonedDateTime
 )

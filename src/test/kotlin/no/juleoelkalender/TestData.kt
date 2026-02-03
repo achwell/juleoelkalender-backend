@@ -166,7 +166,7 @@ fun getCalendarEntity(): CalendarEntity {
             ratingOverall = 1.0,
             comment = null,
             createdAt = now,
-            updatedDate = null,
+            updatedDate = now,
             beer = beerEntity,
             calendar = CalendarEntity(
                     id = calendarId,
@@ -246,7 +246,7 @@ fun getReviewEntity(): ReviewEntity {
     val beerEntity: BeerEntity = getBeerEntity()
     val calendarEntity: CalendarEntity = getCalendarEntity()
     val userEntity: UserEntity = getUserEntity()
-    return ReviewEntity(id = reviewId, ratingLabel = 1.0, ratingLooks = 1.0, ratingSmell = 1.0, ratingTaste = 1.0, ratingFeel = 1.0, ratingOverall = 1.0, comment = null, createdAt = now, updatedDate = null, beer = beerEntity, calendar = calendarEntity, user = userEntity)
+    return ReviewEntity(id = reviewId, ratingLabel = 1.0, ratingLooks = 1.0, ratingSmell = 1.0, ratingTaste = 1.0, ratingFeel = 1.0, ratingOverall = 1.0, comment = null, createdAt = now, updatedDate = now, beer = beerEntity, calendar = calendarEntity, user = userEntity)
 }
 
 

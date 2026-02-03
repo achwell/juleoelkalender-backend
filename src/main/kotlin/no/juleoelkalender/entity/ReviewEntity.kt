@@ -19,7 +19,7 @@ open class ReviewEntity(
         @Basic @Column(name = "ratingOverall", nullable = false) var ratingOverall: Double,
         @Basic @Column(name = "comment") var comment: String?,
         @Basic @Column(name = "createdAt", nullable = false, updatable = false) @CreationTimestamp(source = SourceType.DB) var createdAt: ZonedDateTime,
-        @UpdateTimestamp(source = SourceType.DB) @Column(name = "updatedAt") private var updatedDate: ZonedDateTime?,
+        @UpdateTimestamp(source = SourceType.DB) @Column(name = "updatedAt", nullable = false) private var updatedDate: ZonedDateTime,
         @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "beerId", referencedColumnName = "id", nullable = false) var beer: BeerEntity,
         @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "calendarId", referencedColumnName = "id", nullable = false) var calendar: CalendarEntity,
         @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "reviewerId", referencedColumnName = "id", nullable = false) var user: UserEntity

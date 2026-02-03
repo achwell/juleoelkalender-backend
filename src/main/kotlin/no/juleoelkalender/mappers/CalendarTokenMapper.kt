@@ -15,6 +15,6 @@ class CalendarTokenMapper : BaseMapper<CalendarToken, CalendarTokenEntity> {
     override fun modelToEntity(model: CalendarToken): CalendarTokenEntity = CalendarTokenEntity(
             model.id, model.token,
             model.name, model.active, mutableSetOf(),
-            mutableSetOf(), ZonedDateTime.now(), null
+            mutableSetOf(), ZonedDateTime.now(), ZonedDateTime.now()
     )
 }
