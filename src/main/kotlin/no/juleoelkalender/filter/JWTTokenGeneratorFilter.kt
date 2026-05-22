@@ -13,9 +13,9 @@ import java.io.IOException
 class JWTTokenGeneratorFilter(private val jwtService: JwtService) : OncePerRequestFilter() {
     @Throws(ServletException::class, IOException::class)
     public override fun doFilterInternal(
-            request: HttpServletRequest,
-            response: HttpServletResponse,
-            filterChain: FilterChain
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain
     ) {
         val authentication = SecurityContextHolder.getContext().authentication
         if (null != authentication) {

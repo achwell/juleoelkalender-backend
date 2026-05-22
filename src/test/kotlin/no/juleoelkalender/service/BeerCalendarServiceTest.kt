@@ -8,7 +8,13 @@ import no.juleoelkalender.entity.CalendarEntity
 import no.juleoelkalender.getBeerCalendarEntity
 import no.juleoelkalender.getBeerEntity
 import no.juleoelkalender.getCalendarEntity
-import no.juleoelkalender.mappers.*
+import no.juleoelkalender.mappers.AuthorityMapper
+import no.juleoelkalender.mappers.BeerCalendarMapper
+import no.juleoelkalender.mappers.BeerMapper
+import no.juleoelkalender.mappers.CalendarMapper
+import no.juleoelkalender.mappers.CalendarTokenMapper
+import no.juleoelkalender.mappers.RoleMapper
+import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.BeerCalendar
 import no.juleoelkalender.model.Direction
 import no.juleoelkalender.repository.BeerCalendarRepository
@@ -51,8 +57,8 @@ internal class BeerCalendarServiceTest {
         every { beerCalendarRepository.findAll() } returns listOf(beerCalendarEntity, beerCalendarEntity, beerCalendarEntity)
         val beerCalendars = testSubject.all
         Assertions.assertAll(
-                { Assertions.assertNotNull(beerCalendars) },
-                { Assertions.assertEquals(3, beerCalendars.size) }
+            { Assertions.assertNotNull(beerCalendars) },
+            { Assertions.assertEquals(3, beerCalendars.size) }
         )
     }
 
@@ -69,16 +75,16 @@ internal class BeerCalendarServiceTest {
         every { calendarRepository.getReferenceById(any()) } returns calendarEntity
         every { beerCalendarRepository.save(any()) } returns beerCalendarEntity
         val newBeerCalendar = testSubject.create(
-                beerCalendarMapper.entityToModel(
-                        beerCalendarEntity
-                )
+            beerCalendarMapper.entityToModel(
+                beerCalendarEntity
+            )
         )
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(newBeerCalendar) },
-                { Assertions.assertEquals(calendarEntity.id, newBeerCalendar.calendar.id) },
-                { Assertions.assertEquals(beerEntity.id, newBeerCalendar.beer.id) },
-                { Assertions.assertEquals(beerCalendarEntity.day, newBeerCalendar.day) }
+            { Assertions.assertNotNull(newBeerCalendar) },
+            { Assertions.assertEquals(calendarEntity.id, newBeerCalendar.calendar.id) },
+            { Assertions.assertEquals(beerEntity.id, newBeerCalendar.beer.id) },
+            { Assertions.assertEquals(beerCalendarEntity.day, newBeerCalendar.day) }
         )
     }
 
@@ -93,10 +99,10 @@ internal class BeerCalendarServiceTest {
         val updatedBeerCalendar = testSubject.update(bc.id, beerCalendar)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(updatedBeerCalendar) },
-                { Assertions.assertEquals(calendarEntity.id, updatedBeerCalendar?.calendar?.id) },
-                { Assertions.assertEquals(beerEntity.id, updatedBeerCalendar?.beer?.id) },
-                { Assertions.assertEquals(beerCalendar.day, updatedBeerCalendar?.day) }
+            { Assertions.assertNotNull(updatedBeerCalendar) },
+            { Assertions.assertEquals(calendarEntity.id, updatedBeerCalendar?.calendar?.id) },
+            { Assertions.assertEquals(beerEntity.id, updatedBeerCalendar?.beer?.id) },
+            { Assertions.assertEquals(beerCalendar.day, updatedBeerCalendar?.day) }
         )
     }
 
@@ -118,12 +124,12 @@ internal class BeerCalendarServiceTest {
     fun testMoveBeerCalendarUp() {
         val day = 12
         val beerCalendarEntity1 = BeerCalendarEntity(
-                beerCalendarEntity.id, day,
-                beerEntity, calendarEntity
+            beerCalendarEntity.id, day,
+            beerEntity, calendarEntity
         )
         val beerCalendarEntity2 = BeerCalendarEntity(
-                beerCalendarEntity1.id, day - 1,
-                beerEntity, calendarEntity
+            beerCalendarEntity1.id, day - 1,
+            beerEntity, calendarEntity
         )
         every { beerCalendarRepository.findByDayAndCalendar_Id(day, any()) } returns beerCalendarEntity1
         every { beerCalendarRepository.findByDayAndCalendar_Id(beerCalendarEntity2.day, any()) } returns beerCalendarEntity2
@@ -140,12 +146,12 @@ internal class BeerCalendarServiceTest {
     fun testMoveBeerCalendarDown() {
         val day = 12
         val beerCalendarEntity1 = BeerCalendarEntity(
-                beerCalendarEntity.id, day,
-                beerEntity, calendarEntity
+            beerCalendarEntity.id, day,
+            beerEntity, calendarEntity
         )
         val beerCalendarEntity2 = BeerCalendarEntity(
-                beerCalendarEntity1.id, day + 1,
-                beerEntity, calendarEntity
+            beerCalendarEntity1.id, day + 1,
+            beerEntity, calendarEntity
         )
         every { beerCalendarRepository.findByDayAndCalendar_Id(day, any()) } returns beerCalendarEntity1
         every { beerCalendarRepository.findByDayAndCalendar_Id(beerCalendarEntity2.day, any()) } returns beerCalendarEntity2

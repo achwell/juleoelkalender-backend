@@ -12,7 +12,14 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 import java.net.URISyntaxException
 import java.time.LocalDate
@@ -29,7 +36,7 @@ class BeerController(private val beerService: BeerService, private val localesSe
     @GetMapping(path = ["/review/{calendarId}"])
     @PreAuthorize("hasAuthority('beer:read')")
     fun getBeersWithReviewByCalendar(
-            @PathVariable calendarId: UUID
+        @PathVariable calendarId: UUID
     ): ResponseEntity<Set<BeerWithCalendarDayAndReview>> {
         return ResponseEntity.ok(beerService.getBeersWithReviewByCalendarAndUser(calendarId, null))
     }
@@ -37,7 +44,7 @@ class BeerController(private val beerService: BeerService, private val localesSe
     @GetMapping(path = ["/review/{calendarId}/{userId}"])
     @PreAuthorize("hasAuthority('beer:read')")
     fun getBeersWithReviewByCalendarAndUser(
-            @PathVariable calendarId: UUID, @PathVariable userId: UUID
+        @PathVariable calendarId: UUID, @PathVariable userId: UUID
     ): ResponseEntity<Set<BeerWithCalendarDayAndReview>> {
         return ResponseEntity.ok(beerService.getBeersWithReviewByCalendarAndUser(calendarId, userId))
     }
@@ -52,13 +59,13 @@ class BeerController(private val beerService: BeerService, private val localesSe
     fun getAllBeersWithCalendarExport(@PathVariable locale: String): ResponseEntity<ByteArray> {
         val fileName = localesService.getString(locale, "pages.beeradmin.excelexportfilename")
         return ResponseEntity.ok()
-                .contentType(
-                        MediaType.parseMediaType(
-                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        )
+            .contentType(
+                MediaType.parseMediaType(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
-                .body(beerService.getBeersWithCalendarXlsx(null, null, locale))
+            )
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
+            .body(beerService.getBeersWithCalendarXlsx(null, null, locale))
     }
 
     @get:PreAuthorize("hasAuthority('beer:read')")
@@ -77,7 +84,7 @@ class BeerController(private val beerService: BeerService, private val localesSe
     @GetMapping(path = ["/calendar/{calendarId}"])
     @PreAuthorize("hasAuthority('beer:read')")
     fun getBeersWithCalendarByCalendar(
-            @PathVariable calendarId: UUID
+        @PathVariable calendarId: UUID
     ): ResponseEntity<Set<BeerWithCalendarAndDay>> {
         return ResponseEntity.ok(beerService.getBeersWithCalendar(calendarId, null))
     }

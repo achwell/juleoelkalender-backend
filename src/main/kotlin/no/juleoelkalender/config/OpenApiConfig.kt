@@ -10,13 +10,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 
 @OpenAPIDefinition(
-        info = Info(
-                title = "Juleølkalender",
-                version = "1.0.0",
-                description = "Juleølkalender",
-                license = License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0"),
-                contact = Contact(url = "https://juleoelkalender.no", name = "Axel Wulff Sæther", email = "axelwulff@mac.com")
-        ), security = [SecurityRequirement(name = "bearerAuth")]
+    info = Info(
+        title = "Juleølkalender",
+        version = "1.0.0",
+        description = "Juleølkalender",
+        license = License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0"),
+        contact = Contact(url = "https://juleoelkalender.no", name = "Axel Wulff Sæther", email = "axelwulff@mac.com")
+    ), security = [SecurityRequirement(name = "bearerAuth")]
 )
 @SecurityScheme(name = "bearerAuth", description = "JWT auth description", scheme = "bearer", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", `in` = SecuritySchemeIn.HEADER)
 class OpenApiConfig 

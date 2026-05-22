@@ -9,12 +9,18 @@ import jakarta.servlet.http.HttpServletRequest
 import no.juleoelkalender.exception.InvalidTokenException
 import no.juleoelkalender.getRegisterRequest
 import no.juleoelkalender.getUser
-import no.juleoelkalender.model.*
+import no.juleoelkalender.model.AddTokenRequest
+import no.juleoelkalender.model.AuthenticationRequest
+import no.juleoelkalender.model.AuthenticationResponse
+import no.juleoelkalender.model.RegisterRequest
+import no.juleoelkalender.model.User
 import no.juleoelkalender.model.externalauth.FacebookAuthenticationRequest
 import no.juleoelkalender.model.externalauth.GoogleAuthenticationRequest
 import no.juleoelkalender.service.AuthenticationService
 import no.juleoelkalender.service.UserService
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatusCode
@@ -46,10 +52,10 @@ internal class AuthControllerTest {
         val register = testSubject.register(request)
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertNotNull(register.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(201), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertNotNull(register.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(201), register.statusCode) }
         )
     }
 
@@ -60,10 +66,10 @@ internal class AuthControllerTest {
         val register = testSubject.authenticate(request)
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertNotNull(register.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertNotNull(register.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
         )
     }
 
@@ -74,10 +80,10 @@ internal class AuthControllerTest {
         val register = testSubject.loginWithFacebook(request)
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertNotNull(register.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertNotNull(register.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
         )
     }
 
@@ -88,10 +94,10 @@ internal class AuthControllerTest {
         val register = testSubject.loginWithGoogle(request)
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertNotNull(register.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertNotNull(register.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
         )
     }
 
@@ -102,9 +108,9 @@ internal class AuthControllerTest {
         val register = testSubject.addtoken(request)
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
         )
     }
 
@@ -115,10 +121,10 @@ internal class AuthControllerTest {
         val register = testSubject.refresh(request)
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertNotNull(register.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertNotNull(register.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
         )
     }
 
@@ -129,10 +135,10 @@ internal class AuthControllerTest {
         val register = testSubject.refresh(request)
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertNotNull(register.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(401), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertNotNull(register.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(401), register.statusCode) }
         )
     }
 
@@ -142,10 +148,10 @@ internal class AuthControllerTest {
         val register = testSubject.userExist(user.email)
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertNotNull(register.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertNotNull(register.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
         )
     }
 
@@ -155,10 +161,10 @@ internal class AuthControllerTest {
         val register = testSubject.userExist("first@last.no")
 
         assertAll(
-                { assertNotNull(register) },
-                { assertNotNull(register.statusCode) },
-                { assertNotNull(register.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
+            { assertNotNull(register) },
+            { assertNotNull(register.statusCode) },
+            { assertNotNull(register.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(200), register.statusCode) }
         )
     }
 }

@@ -25,17 +25,17 @@ import java.util.UUID
 
 @Service
 class UserServiceImpl(
-        private val userRepository: UserRepository, private val calendarTokenRepository: CalendarTokenRepository,
-        private val roleRepository: RoleRepository, mapper: UserMapper, private val passwordEncoder: PasswordEncoder,
-        private val excelGenerator: ExcelGenerator, private val localesService: LocalesService,
-        private val deviceRepository: DeviceRepository
+    private val userRepository: UserRepository, private val calendarTokenRepository: CalendarTokenRepository,
+    private val roleRepository: RoleRepository, mapper: UserMapper, private val passwordEncoder: PasswordEncoder,
+    private val excelGenerator: ExcelGenerator, private val localesService: LocalesService,
+    private val deviceRepository: DeviceRepository
 ) : BaseServiceImpl<UUID, User, UserEntity>(userRepository, mapper), UserService {
 
     @NullMarked
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(email: String): UserDetails {
         val userEntity = userRepository.findByEmailIgnoreCase(email)
-                ?: throw UsernameNotFoundException("User with email: $email not found !")
+            ?: throw UsernameNotFoundException("User with email: $email not found !")
         userEntity.calendarToken = userEntity.calendarToken.filter(CalendarTokenEntity::active).toMutableSet()
         val user = mapper.entityToModel(userEntity)
         return postGet(user)
@@ -43,27 +43,27 @@ class UserServiceImpl(
 
     override fun updatePassword(email: String, password: String): User {
         val userEntity = userRepository.findByEmailIgnoreCase(email)
-                ?: throw UsernameNotFoundException("User with email: $email not found !")
+            ?: throw UsernameNotFoundException("User with email: $email not found !")
         userEntity.password = passwordEncoder.encode(password)!!
         return mapper.entityToModel(repository.save(userEntity))
     }
 
     override fun getUsersXlsx(locale: String): ByteArray {
         val headers = arrayOf(
-                localesService.getString(locale, "pages.users.name"),
-                localesService.getString(locale, "pages.users.email"),
-                localesService.getString(locale, "pages.users.area"),
-                localesService.getString(locale, "pages.users.role"),
-                localesService.getString(locale, "pages.users.numberofbeers")
+            localesService.getString(locale, "pages.users.name"),
+            localesService.getString(locale, "pages.users.email"),
+            localesService.getString(locale, "pages.users.area"),
+            localesService.getString(locale, "pages.users.role"),
+            localesService.getString(locale, "pages.users.numberofbeers")
         )
         val rowData = all.map {
             val role = localesService.getString(
-                    locale,
-                    it.role.name.name.lowercase().replace("_", ".")
+                locale,
+                it.role.name.name.lowercase().replace("_", ".")
             )
             arrayOf<Any>(
-                    it.name, it.email, it.area ?: "", role,
-                    it.beers.size
+                it.name, it.email, it.area ?: "", role,
+                it.beers.size
             )
         }.toList()
         val sheetname = localesService.getString(locale, "menu.users")

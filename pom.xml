@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.2</version>
+    <version>4.0.6</version>
     <relativePath /> <!-- lookup parent from repository -->
   </parent>
   <groupId>no.juleoelkalender</groupId>
@@ -22,29 +22,33 @@
     <project.scm.id>juleoelkalender</project.scm.id>
     <java.version>25</java.version>
     <kotlin.jvmVersion>${java.version}</kotlin.jvmVersion>
-    <kotlin.version>2.3.0</kotlin.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.projectKey>achwell</sonar.projectKey>
     <sonar.organization>achwell</sonar.organization>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.source.skip>false</maven.source.skip>
     <maven.javadoc.skip>false</maven.javadoc.skip>
-    <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
-    <maven-release-plugin-version>3.3.1</maven-release-plugin-version>
+    <maven.version>3.8.8</maven.version>
+
+    <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
     <maven-scm-plugin.version>2.2.1</maven-scm-plugin.version>
     <maven-scm-provider-gitexe.version>2.2.1</maven-scm-provider-gitexe.version>
-    <maven.version>3.8.8</maven.version>
-    <springdoc-openapi-starter-webmvc-ui.version>3.0.1</springdoc-openapi-starter-webmvc-ui.version>
-    <sonar-maven-plugin.version>5.5.0.6356</sonar-maven-plugin.version>
-    <jjwt.version>0.13.0</jjwt.version>
-    <mockk-jvm.version>1.14.9</mockk-jvm.version>
-    <poi.version>5.5.1</poi.version>
+    <maven-release-plugin-version>3.3.1</maven-release-plugin-version>
+    <sonar-maven-plugin.version>5.6.0.6792</sonar-maven-plugin.version>
+
     <commons-compress.version>1.28.0</commons-compress.version>
+    <jjwt.version>0.13.0</jjwt.version>
+    <poi.version>5.5.1</poi.version>
+    <mockk-jvm.version>1.14.9</mockk-jvm.version>
+    <springdoc-openapi-starter-webmvc-ui.version>3.0.3</springdoc-openapi-starter-webmvc-ui.version>
+    <swagger-annotations.version>2.2.50</swagger-annotations.version>
+
+    <!-- Override versions from spring boot -->
     <commons-lang3.version>3.20.0</commons-lang3.version>
-    <httpclient5.version>5.6</httpclient5.version>
-    <jackson-2-bom.version>2.21.0</jackson-2-bom.version>
-    <logback.version>1.5.27</logback.version>
-    <swagger-annotations.version>2.2.42</swagger-annotations.version>
+    <httpclient5.version>5.6.1</httpclient5.version>
+    <jackson-2-bom.version>2.21.3</jackson-2-bom.version>
+    <kotlin.version>2.3.21</kotlin.version>
+
   </properties>
   <dependencies>
     <dependency>

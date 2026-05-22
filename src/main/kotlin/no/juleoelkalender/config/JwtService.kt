@@ -19,11 +19,11 @@ class JwtService(@param:Value($$"${app.jwt.secret_key}") private val jwtKey: Str
 
     fun generateToken(name: String, authorities: Collection<GrantedAuthority>): String {
         return buildToken(
-                extraClaims = emptyMap<String, Any>(),
-                username = name,
-                authorities = authorities,
-                jwtKey = jwtKey,
-                jwtExpiresTimeoutMs = jwtExpiresTimeoutMs
+            extraClaims = emptyMap<String, Any>(),
+            username = name,
+            authorities = authorities,
+            jwtKey = jwtKey,
+            jwtExpiresTimeoutMs = jwtExpiresTimeoutMs
         )
     }
 

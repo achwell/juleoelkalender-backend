@@ -10,7 +10,13 @@ import no.juleoelkalender.getBeer
 import no.juleoelkalender.getBeerCalendarEntity
 import no.juleoelkalender.getCalendar
 import no.juleoelkalender.getCalendarEntity
-import no.juleoelkalender.mappers.*
+import no.juleoelkalender.mappers.AuthorityMapper
+import no.juleoelkalender.mappers.BeerCalendarMapper
+import no.juleoelkalender.mappers.BeerMapper
+import no.juleoelkalender.mappers.CalendarMapper
+import no.juleoelkalender.mappers.CalendarTokenMapper
+import no.juleoelkalender.mappers.RoleMapper
+import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.Beer
 import no.juleoelkalender.model.Calendar
 import no.juleoelkalender.repository.CalendarRepository
@@ -50,8 +56,8 @@ internal class CalendarServiceTest {
 
         val calendars = testSubject.all
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendars) },
-                { Assertions.assertEquals(3, calendars.size) }
+            { Assertions.assertNotNull(calendars) },
+            { Assertions.assertEquals(3, calendars.size) }
         )
     }
 
@@ -61,18 +67,18 @@ internal class CalendarServiceTest {
 
         val calendarWithBeers = testSubject.getCalendarWithBeers(calendarEntity.id!!)
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendarWithBeers) },
-                { Assertions.assertEquals(1, calendarWithBeers.size) }
+            { Assertions.assertNotNull(calendarWithBeers) },
+            { Assertions.assertEquals(1, calendarWithBeers.size) }
         )
         val calendarWithBeer = calendarWithBeers.first()
         Assertions.assertAll(
-                { Assertions.assertEquals(beer.id, calendarWithBeer.beer.id) },
-                { Assertions.assertEquals(beer.name, calendarWithBeer.beer.name) },
-                { Assertions.assertEquals(calendarEntity.name, calendarWithBeer.name) },
-                { Assertions.assertEquals(calendarEntity.year, calendarWithBeer.year) },
-                { Assertions.assertEquals(beerCalendarEntity.day, calendarWithBeer.day) },
-                { Assertions.assertEquals(calendarEntity.published, calendarWithBeer.published) },
-                { Assertions.assertEquals(calendarEntity.archived, calendarWithBeer.archived) }
+            { Assertions.assertEquals(beer.id, calendarWithBeer.beer.id) },
+            { Assertions.assertEquals(beer.name, calendarWithBeer.beer.name) },
+            { Assertions.assertEquals(calendarEntity.name, calendarWithBeer.name) },
+            { Assertions.assertEquals(calendarEntity.year, calendarWithBeer.year) },
+            { Assertions.assertEquals(beerCalendarEntity.day, calendarWithBeer.day) },
+            { Assertions.assertEquals(calendarEntity.published, calendarWithBeer.published) },
+            { Assertions.assertEquals(calendarEntity.archived, calendarWithBeer.archived) }
         )
     }
 
@@ -81,8 +87,8 @@ internal class CalendarServiceTest {
         every { calendarRepository.findById(any()) } returns Optional.of(calendarEntity)
         val calendar = testSubject.getById(calendarEntity.id!!)
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendar) },
-                { Assertions.assertEquals(calendarEntity.id, calendar?.id) }
+            { Assertions.assertNotNull(calendar) },
+            { Assertions.assertEquals(calendarEntity.id, calendar?.id) }
         )
     }
 
@@ -91,20 +97,20 @@ internal class CalendarServiceTest {
         every { calendarRepository.save(any()) } returns calendarEntity
         val calendar = testSubject.create(calendarMapper.entityToModel(calendarEntity))
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendar) },
-                { Assertions.assertEquals(calendarEntity.id, calendar.id) },
-                { Assertions.assertEquals(calendarEntity.name, calendar.name) },
-                { Assertions.assertEquals(calendarEntity.year, calendar.year) },
-                { Assertions.assertFalse(calendar.archived) }
+            { Assertions.assertNotNull(calendar) },
+            { Assertions.assertEquals(calendarEntity.id, calendar.id) },
+            { Assertions.assertEquals(calendarEntity.name, calendar.name) },
+            { Assertions.assertEquals(calendarEntity.year, calendar.year) },
+            { Assertions.assertFalse(calendar.archived) }
         )
     }
 
     @Test
     fun testUpdateCalendar() {
         val calendar = Calendar(
-                this.calendar.id, "UPDATED NAME",
-                this.calendar.year, this.calendar.published, this.calendar.archived,
-                this.calendar.beerCalendars, this.calendar.calendarToken
+            this.calendar.id, "UPDATED NAME",
+            this.calendar.year, this.calendar.published, this.calendar.archived,
+            this.calendar.beerCalendars, this.calendar.calendarToken
         )
 
         every { calendarRepository.findById(any()) } returns Optional.of(calendarEntity)
@@ -112,11 +118,11 @@ internal class CalendarServiceTest {
 
         val updatedCalendar = testSubject.update(this.calendar.id!!, calendar)
         Assertions.assertAll(
-                { Assertions.assertNotNull(updatedCalendar) },
-                { Assertions.assertEquals(calendarEntity.id, updatedCalendar?.id) },
-                { Assertions.assertEquals(calendar.year, updatedCalendar?.year) },
-                { Assertions.assertEquals(calendarEntity.name, updatedCalendar?.name) },
-                { Assertions.assertFalse(updatedCalendar?.archived ?: false) }
+            { Assertions.assertNotNull(updatedCalendar) },
+            { Assertions.assertEquals(calendarEntity.id, updatedCalendar?.id) },
+            { Assertions.assertEquals(calendar.year, updatedCalendar?.year) },
+            { Assertions.assertEquals(calendarEntity.name, updatedCalendar?.name) },
+            { Assertions.assertFalse(updatedCalendar?.archived ?: false) }
         )
     }
 

@@ -18,8 +18,8 @@ import java.nio.charset.StandardCharsets
 
 @Service
 class LocalesServiceImpl(
-        private val jsonMapper: JsonMapper,
-        @param:Value($$"${app.locales.missing}") private val missingRootLocation: String
+    private val jsonMapper: JsonMapper,
+    @param:Value($$"${app.locales.missing}") private val missingRootLocation: String
 ) : LocalesService {
 
     @Throws(IOException::class)

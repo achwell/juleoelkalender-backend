@@ -4,7 +4,9 @@ import no.juleoelkalender.entity.BeerCalendarEntity
 import no.juleoelkalender.getBeerCalendar
 import no.juleoelkalender.getBeerCalendarEntity
 import no.juleoelkalender.model.BeerCalendar
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -26,9 +28,9 @@ internal class BeerCalendarMapperTest {
     fun testEntityToModel() {
         val beerCalendar = testSubject.entityToModel(beerCalendarEntity)
         assertAll(
-                { assertNotNull(beerCalendar) },
-                { assertEquals(beerCalendarEntity.beer.id, beerCalendar.beer.id) },
-                { assertEquals(beerCalendarEntity.calendar.id, beerCalendar.calendar.id) }
+            { assertNotNull(beerCalendar) },
+            { assertEquals(beerCalendarEntity.beer.id, beerCalendar.beer.id) },
+            { assertEquals(beerCalendarEntity.calendar.id, beerCalendar.calendar.id) }
         )
     }
 
@@ -36,13 +38,13 @@ internal class BeerCalendarMapperTest {
     fun testModelToEntity() {
         val beerCalendarEntity = testSubject.modelToEntity(beerCalendar)
         assertAll(
-                { assertNotNull(beerCalendarEntity) },
-                { assertEquals(beerCalendar.beer.id, beerCalendarEntity.beer.id) },
-                {
-                    assertEquals(
-                            beerCalendar.calendar.id, beerCalendarEntity.calendar.id
-                    )
-                }
+            { assertNotNull(beerCalendarEntity) },
+            { assertEquals(beerCalendar.beer.id, beerCalendarEntity.beer.id) },
+            {
+                assertEquals(
+                    beerCalendar.calendar.id, beerCalendarEntity.calendar.id
+                )
+            }
         )
     }
 }

@@ -34,11 +34,11 @@ internal class CalendarControllerTest {
         val calendars = testSubject.calendars
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendars) },
-                { Assertions.assertNotNull(calendars.statusCode) },
-                { Assertions.assertNotNull(calendars.getBody()) },
-                { Assertions.assertEquals(1, calendars.getBody()?.size) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(200), calendars.statusCode) }
+            { Assertions.assertNotNull(calendars) },
+            { Assertions.assertNotNull(calendars.statusCode) },
+            { Assertions.assertNotNull(calendars.getBody()) },
+            { Assertions.assertEquals(1, calendars.getBody()?.size) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(200), calendars.statusCode) }
         )
     }
 
@@ -48,10 +48,10 @@ internal class CalendarControllerTest {
         val calendar = testSubject.getCalendarById(calendar.id!!)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendar) },
-                { Assertions.assertNotNull(calendar.statusCode) },
-                { Assertions.assertNotNull(calendar.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(200), calendar.statusCode) }
+            { Assertions.assertNotNull(calendar) },
+            { Assertions.assertNotNull(calendar.statusCode) },
+            { Assertions.assertNotNull(calendar.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(200), calendar.statusCode) }
         )
     }
 
@@ -61,10 +61,10 @@ internal class CalendarControllerTest {
         val calendars = testSubject.getCalendarWithBeers(calendar.id!!)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendars) },
-                { Assertions.assertNotNull(calendars.statusCode) },
-                { Assertions.assertNotNull(calendars.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(200), calendars.statusCode) }
+            { Assertions.assertNotNull(calendars) },
+            { Assertions.assertNotNull(calendars.statusCode) },
+            { Assertions.assertNotNull(calendars.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(200), calendars.statusCode) }
         )
     }
 
@@ -75,10 +75,10 @@ internal class CalendarControllerTest {
         val calendar = testSubject.createCalendar(this.calendar)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendar) },
-                { Assertions.assertNotNull(calendar.statusCode) },
-                { Assertions.assertNotNull(calendar.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(201), calendar.statusCode) }
+            { Assertions.assertNotNull(calendar) },
+            { Assertions.assertNotNull(calendar.statusCode) },
+            { Assertions.assertNotNull(calendar.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(201), calendar.statusCode) }
         )
     }
 
@@ -86,15 +86,15 @@ internal class CalendarControllerTest {
     fun testUpdateCalendar() {
         every { calendarService.update(any(), any()) } returns calendar
         val calendar = testSubject.updateCalendar(
-                calendar.id!!,
-                calendar
+            calendar.id!!,
+            calendar
         )
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendar) },
-                { Assertions.assertNotNull(calendar.statusCode) },
-                { Assertions.assertNotNull(calendar.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(200), calendar.statusCode) }
+            { Assertions.assertNotNull(calendar) },
+            { Assertions.assertNotNull(calendar.statusCode) },
+            { Assertions.assertNotNull(calendar.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(200), calendar.statusCode) }
         )
     }
 
@@ -104,10 +104,10 @@ internal class CalendarControllerTest {
         val calendar = testSubject.deleteCalendar(calendar.id!!)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(calendar) },
-                { Assertions.assertNotNull(calendar.statusCode) },
-                { Assertions.assertNull(calendar.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(204), calendar.statusCode) }
+            { Assertions.assertNotNull(calendar) },
+            { Assertions.assertNotNull(calendar.statusCode) },
+            { Assertions.assertNull(calendar.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(204), calendar.statusCode) }
         )
     }
 }

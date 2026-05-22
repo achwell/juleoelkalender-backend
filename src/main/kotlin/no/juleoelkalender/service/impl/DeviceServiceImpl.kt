@@ -13,8 +13,8 @@ import java.util.function.Consumer
 
 @Service
 class DeviceServiceImpl(
-        repository: DeviceRepository, mapper: DeviceMapper,
-        private val userWithoutChildrenMapper: UserWithoutChildrenMapper
+    repository: DeviceRepository, mapper: DeviceMapper,
+    private val userWithoutChildrenMapper: UserWithoutChildrenMapper
 ) : BaseServiceImpl<UUID, Device, DeviceEntity>(repository, mapper), DeviceService {
 
     override fun preCreate(model: Device): DeviceEntity {

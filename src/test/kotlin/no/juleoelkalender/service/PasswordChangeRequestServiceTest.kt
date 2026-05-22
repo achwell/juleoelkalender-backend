@@ -12,7 +12,11 @@ import no.juleoelkalender.mappers.PasswordChangeRequestMapper
 import no.juleoelkalender.model.PasswordChangeRequest
 import no.juleoelkalender.repository.PasswordChangeRequestRepository
 import no.juleoelkalender.service.impl.PasswordChangeRequestServiceImpl
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.core.io.ByteArrayResource
@@ -43,8 +47,8 @@ internal class PasswordChangeRequestServiceTest {
         every { passwordChangeRequestRepository.findAll() } returns listOf(passwordChangeRequestEntity, passwordChangeRequestEntity, passwordChangeRequestEntity)
         val passwordChangeRequests = testSubject.all
         assertAll(
-                { assertNotNull(passwordChangeRequests) },
-                { assertEquals(1, passwordChangeRequests.size) }
+            { assertNotNull(passwordChangeRequests) },
+            { assertEquals(1, passwordChangeRequests.size) }
         )
     }
 
@@ -52,11 +56,11 @@ internal class PasswordChangeRequestServiceTest {
     fun testGetPasswordChangeRequestById() {
         every { passwordChangeRequestRepository.findById(any()) } returns Optional.of(passwordChangeRequestEntity)
         val passwordChangeRequest = testSubject.getById(
-                passwordChangeRequestEntity.id
+            passwordChangeRequestEntity.id
         )
         assertAll(
-                { assertNotNull(passwordChangeRequest) },
-                { assertEquals(passwordChangeRequestEntity.id, passwordChangeRequest?.id) }
+            { assertNotNull(passwordChangeRequest) },
+            { assertEquals(passwordChangeRequestEntity.id, passwordChangeRequest?.id) }
         )
     }
 
@@ -64,38 +68,38 @@ internal class PasswordChangeRequestServiceTest {
     @Throws(MessagingException::class)
     fun testCreatePasswordChangeRequest() {
         val pcr = passwordChangeRequestMapper.entityToModel(
-                passwordChangeRequestEntity
+            passwordChangeRequestEntity
         )
         val passwordChangeRequest = PasswordChangeRequest(
-                UUID.randomUUID(), pcr.token,
-                pcr.email, ZonedDateTime.now()
+            UUID.randomUUID(), pcr.token,
+            pcr.email, ZonedDateTime.now()
         )
         every { passwordChangeRequestRepository.save(any()) } returns passwordChangeRequestEntity
         every { emailService.sendSimpleMessage(any(), any(), any(), any()) } just Runs
         val newPasswordChangeRequest = testSubject.create(passwordChangeRequest)
         assertAll(
-                { assertNotNull(newPasswordChangeRequest) },
-                { assertEquals(passwordChangeRequestEntity.id, newPasswordChangeRequest.id) },
-                { assertEquals(passwordChangeRequestEntity.token, newPasswordChangeRequest.token) },
-                { assertEquals(passwordChangeRequestEntity.email, newPasswordChangeRequest.email) }
+            { assertNotNull(newPasswordChangeRequest) },
+            { assertEquals(passwordChangeRequestEntity.id, newPasswordChangeRequest.id) },
+            { assertEquals(passwordChangeRequestEntity.token, newPasswordChangeRequest.token) },
+            { assertEquals(passwordChangeRequestEntity.email, newPasswordChangeRequest.email) }
         )
     }
 
     @Test
     fun testUpdatePasswordChangeRequest() {
         val passwordChangeRequest = passwordChangeRequestMapper.entityToModel(
-                passwordChangeRequestEntity
+            passwordChangeRequestEntity
         )
-        every { passwordChangeRequestRepository.findById(any()) } returns Optional.of<PasswordChangeRequestEntity>(passwordChangeRequestEntity)
+        every { passwordChangeRequestRepository.findById(any()) } returns Optional.of(passwordChangeRequestEntity)
         every { passwordChangeRequestRepository.save(any()) } returns passwordChangeRequestEntity
         val updatedCalendarToken = testSubject.update(
-                passwordChangeRequestEntity.id, passwordChangeRequest
+            passwordChangeRequestEntity.id, passwordChangeRequest
         )
         assertAll(
-                { assertNotNull(updatedCalendarToken) },
-                { assertEquals(passwordChangeRequestEntity.id, updatedCalendarToken?.id) },
-                { assertEquals(passwordChangeRequest.token, updatedCalendarToken?.token) },
-                { assertEquals(passwordChangeRequestEntity.email, updatedCalendarToken?.email) }
+            { assertNotNull(updatedCalendarToken) },
+            { assertEquals(passwordChangeRequestEntity.id, updatedCalendarToken?.id) },
+            { assertEquals(passwordChangeRequest.token, updatedCalendarToken?.token) },
+            { assertEquals(passwordChangeRequestEntity.email, updatedCalendarToken?.email) }
         )
     }
 

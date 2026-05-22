@@ -1,7 +1,11 @@
 package no.juleoelkalender.service.impl
 
 import no.juleoelkalender.model.DashboardData
-import no.juleoelkalender.service.*
+import no.juleoelkalender.service.BeerService
+import no.juleoelkalender.service.CalendarService
+import no.juleoelkalender.service.DashboardService
+import no.juleoelkalender.service.DeviceService
+import no.juleoelkalender.service.UserService
 import org.springframework.boot.actuate.info.InfoEndpoint
 import org.springframework.boot.health.actuate.endpoint.HealthEndpoint
 import org.springframework.boot.health.application.DiskSpaceHealthIndicator
@@ -15,11 +19,11 @@ import java.time.ZonedDateTime
 
 @Service
 class DashboardServiceImpl(
-        private val healthIndicators: MutableSet<HealthIndicator>,
-        private val healthEndpoint: HealthEndpoint, private val beerService: BeerService,
-        private val calendarService: CalendarService, private val deviceService: DeviceService,
-        private val userService: UserService, private val infoEndpoint: InfoEndpoint,
-        private val metricsEndpoint: MetricsEndpoint
+    private val healthIndicators: MutableSet<HealthIndicator>,
+    private val healthEndpoint: HealthEndpoint, private val beerService: BeerService,
+    private val calendarService: CalendarService, private val deviceService: DeviceService,
+    private val userService: UserService, private val infoEndpoint: InfoEndpoint,
+    private val metricsEndpoint: MetricsEndpoint
 ) : DashboardService {
 
     override val dashboardData: DashboardData
@@ -36,7 +40,7 @@ class DashboardServiceImpl(
                     backendBuildTime = (build["time"] as Instant).atZone(ZoneId.systemDefault())
                 }
             }
-            val diskSpaceHealthIndicators = healthIndicators.filter { DiskSpaceHealthIndicator::class.java.isInstance(it) }
+            val diskSpaceHealthIndicators = healthIndicators.filterIsInstance<DiskSpaceHealthIndicator>()
             if (diskSpaceHealthIndicators.isEmpty()) {
                 RuntimeException("Health check for disk space not activated")
             }
@@ -59,30 +63,30 @@ class DashboardServiceImpl(
             val beers = beerService.all.filter { !it.archived }
             val year = LocalDate.now().year
             val placedBeers = beerService.getBeersWithCalendar(null, null)
-                    .filter { it.calendar?.year == year }
+                .filter { it.calendar?.year == year }
             val newestBeer = beers.maxByOrNull { it.createdDate }
             val activeCalendars = calendarService.all.filter { !it.archived && it.year == year }
             val devices = deviceService.all.toMutableSet()
             return DashboardData(
-                    backendVersion,
-                    backendBuildTime!!,
-                    cpuLoad,
-                    freeDisk / 1024 / 1024 / 1024,
-                    (freeDisk * 100) / totalDisk,
-                    (totalMemory - usedMemory) / 1024 / 1024 / 1024,
-                    processUptime,
-                    devices,
-                    dbStatus!!,
-                    emailStatus!!,
-                    backendStatus,
-                    users.size,
-                    newestUser?.userWithoutChildren!!,
-                    activeUsers.size,
-                    newestActiveUser?.userWithoutChildren!!,
-                    beers.size,
-                    beers.size - placedBeers.size,
-                    (activeCalendars.size * 24) - placedBeers.size,
-                    newestBeer!!
+                backendVersion,
+                backendBuildTime!!,
+                cpuLoad,
+                freeDisk / 1024 / 1024 / 1024,
+                (freeDisk * 100) / totalDisk,
+                (totalMemory - usedMemory) / 1024 / 1024 / 1024,
+                processUptime,
+                devices,
+                dbStatus!!,
+                emailStatus!!,
+                backendStatus,
+                users.size,
+                newestUser?.userWithoutChildren!!,
+                activeUsers.size,
+                newestActiveUser?.userWithoutChildren!!,
+                beers.size,
+                beers.size - placedBeers.size,
+                (activeCalendars.size * 24) - placedBeers.size,
+                newestBeer!!
             )
         }
 

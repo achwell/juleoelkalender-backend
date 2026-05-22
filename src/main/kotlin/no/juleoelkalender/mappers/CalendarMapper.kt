@@ -25,6 +25,17 @@ class CalendarMapper(private val beerMapper: BeerMapper, private val calendarTok
     }
 
     private fun calendarToCalendarEntity(calendar: Calendar): CalendarEntity {
-        return CalendarEntity(calendar.id, calendar.name, calendar.year, calendar.published, calendar.archived, mutableSetOf(), calendarTokenMapper.modelToEntity(calendar.calendarToken), mutableSetOf(), ZonedDateTime.now(), ZonedDateTime.now())
+        return CalendarEntity(
+            calendar.id,
+            calendar.name,
+            calendar.year,
+            calendar.published,
+            calendar.archived,
+            mutableSetOf(),
+            calendarTokenMapper.modelToEntity(calendar.calendarToken),
+            mutableSetOf(),
+            ZonedDateTime.now(),
+            ZonedDateTime.now()
+        )
     }
 }

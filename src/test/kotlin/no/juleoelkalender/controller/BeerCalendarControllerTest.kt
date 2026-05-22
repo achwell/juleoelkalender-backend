@@ -37,11 +37,11 @@ internal class BeerCalendarControllerTest {
         val beerCalendars = testSubject.beerCalendars
 
         assertAll(
-                { assertNotNull(beerCalendars) },
-                { assertNotNull(beerCalendars.statusCode) },
-                { assertNotNull(beerCalendars.getBody()) },
-                { assertEquals(1, beerCalendars.getBody()?.size) },
-                { assertEquals(HttpStatusCode.valueOf(200), beerCalendars.statusCode) }
+            { assertNotNull(beerCalendars) },
+            { assertNotNull(beerCalendars.statusCode) },
+            { assertNotNull(beerCalendars.getBody()) },
+            { assertEquals(1, beerCalendars.getBody()?.size) },
+            { assertEquals(HttpStatusCode.valueOf(200), beerCalendars.statusCode) }
         )
     }
 
@@ -51,10 +51,10 @@ internal class BeerCalendarControllerTest {
         val beerCalendars = testSubject.getBeerCalendarById(beerCalendar.id)
 
         assertAll(
-                { assertNotNull(beerCalendars) },
-                { assertNotNull(beerCalendars.statusCode) },
-                { assertNotNull(beerCalendars.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(200), beerCalendars.statusCode) }
+            { assertNotNull(beerCalendars) },
+            { assertNotNull(beerCalendars.statusCode) },
+            { assertNotNull(beerCalendars.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(200), beerCalendars.statusCode) }
         )
     }
 
@@ -63,11 +63,11 @@ internal class BeerCalendarControllerTest {
         every { beerCalendarService.getById(any()) } returns null
 
         val thrown = assertThrows(
-                NotFoundException::class.java
+            NotFoundException::class.java
         ) { testSubject.getBeerCalendarById(beerCalendar.id) }
         assertAll(
-                { assertNotNull(thrown) },
-                { assertNull(thrown.message) }
+            { assertNotNull(thrown) },
+            { assertNull(thrown.message) }
         )
     }
 
@@ -76,14 +76,14 @@ internal class BeerCalendarControllerTest {
     fun testCreateBeerCalendar() {
         every { beerCalendarService.create(any()) } returns beerCalendar
         val beerCalendars = testSubject.createBeerCalendar(
-                beerCalendar
+            beerCalendar
         )
 
         assertAll(
-                { assertNotNull(beerCalendars) },
-                { assertNotNull(beerCalendars.statusCode) },
-                { assertNotNull(beerCalendars.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(201), beerCalendars.statusCode) }
+            { assertNotNull(beerCalendars) },
+            { assertNotNull(beerCalendars.statusCode) },
+            { assertNotNull(beerCalendars.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(201), beerCalendars.statusCode) }
         )
     }
 
@@ -92,15 +92,15 @@ internal class BeerCalendarControllerTest {
         every { beerCalendarService.moveBeerCalendar(any(), any(), any()) } just Runs
 
         val beerCalendars = testSubject.moveBeerCalendar(
-                beerCalendar.id, 10,
-                Direction.DOWN
+            beerCalendar.id, 10,
+            Direction.DOWN
         )
 
         assertAll(
-                { assertNotNull(beerCalendars) },
-                { assertNotNull(beerCalendars.statusCode) },
-                { assertNull(beerCalendars.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(204), beerCalendars.statusCode) }
+            { assertNotNull(beerCalendars) },
+            { assertNotNull(beerCalendars.statusCode) },
+            { assertNull(beerCalendars.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(204), beerCalendars.statusCode) }
         )
     }
 
@@ -108,15 +108,15 @@ internal class BeerCalendarControllerTest {
     fun testUpdateBeerCalendar() {
         every { beerCalendarService.update(any(), any()) } returns beerCalendar
         val beerCalendars = testSubject.updateBeerCalendar(
-                beerCalendar.id,
-                beerCalendar
+            beerCalendar.id,
+            beerCalendar
         )
 
         assertAll(
-                { assertNotNull(beerCalendars) },
-                { assertNotNull(beerCalendars.statusCode) },
-                { assertNotNull(beerCalendars.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(200), beerCalendars.statusCode) }
+            { assertNotNull(beerCalendars) },
+            { assertNotNull(beerCalendars.statusCode) },
+            { assertNotNull(beerCalendars.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(200), beerCalendars.statusCode) }
         )
     }
 
@@ -126,10 +126,10 @@ internal class BeerCalendarControllerTest {
         val beerCalendars = testSubject.deleteBeerCalendar(beerCalendar.id)
 
         assertAll(
-                { assertNotNull(beerCalendars) },
-                { assertNotNull(beerCalendars.statusCode) },
-                { assertNull(beerCalendars.getBody()) },
-                { assertEquals(HttpStatusCode.valueOf(204), beerCalendars.statusCode) }
+            { assertNotNull(beerCalendars) },
+            { assertNotNull(beerCalendars.statusCode) },
+            { assertNull(beerCalendars.getBody()) },
+            { assertEquals(HttpStatusCode.valueOf(204), beerCalendars.statusCode) }
         )
     }
 }

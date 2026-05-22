@@ -4,9 +4,24 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import no.juleoelkalender.*
-import no.juleoelkalender.entity.*
-import no.juleoelkalender.mappers.*
+import no.juleoelkalender.entity.BeerCalendarEntity
+import no.juleoelkalender.entity.BeerEntity
+import no.juleoelkalender.entity.BeerStyleEntity
+import no.juleoelkalender.entity.CalendarEntity
+import no.juleoelkalender.entity.ReviewEntity
+import no.juleoelkalender.entity.UserEntity
+import no.juleoelkalender.getBeer
+import no.juleoelkalender.getBeerEntity
+import no.juleoelkalender.getBeerStyleEntity
+import no.juleoelkalender.getCalendarEntity
+import no.juleoelkalender.getUserEntity
+import no.juleoelkalender.mappers.AuthorityMapper
+import no.juleoelkalender.mappers.BeerMapper
+import no.juleoelkalender.mappers.CalendarMapper
+import no.juleoelkalender.mappers.CalendarTokenMapper
+import no.juleoelkalender.mappers.ReviewMapper
+import no.juleoelkalender.mappers.RoleMapper
+import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.Beer
 import no.juleoelkalender.repository.BeerRepository
 import no.juleoelkalender.repository.BeerStyleRepository
@@ -56,16 +71,16 @@ internal class BeerServiceTest {
         calendarEntity = getCalendarEntity()
         userEntity = getUserEntity()
         testSubject = BeerServiceImpl(
-                beerRepository,
-                beerStyleRepository,
-                calendarRepository,
-                userRepository,
-                beerMapper,
-                calendarMapper,
-                reviewMapper,
-                userWithoutChildrenMapper,
-                ExcelGenerator(),
-                localesService
+            beerRepository,
+            beerStyleRepository,
+            calendarRepository,
+            userRepository,
+            beerMapper,
+            calendarMapper,
+            reviewMapper,
+            userWithoutChildrenMapper,
+            ExcelGenerator(),
+            localesService
         )
     }
 
@@ -74,8 +89,8 @@ internal class BeerServiceTest {
         every { beerRepository.findAll() } returns listOf(beerEntity, beerEntity, beerEntity)
         val beers = testSubject.all
         Assertions.assertAll(
-                { Assertions.assertNotNull(beers) },
-                { Assertions.assertEquals(3, beers.size) }
+            { Assertions.assertNotNull(beers) },
+            { Assertions.assertEquals(3, beers.size) }
         )
     }
 
@@ -83,15 +98,15 @@ internal class BeerServiceTest {
     fun getBeersWithReviewByCalendarAndUser() {
         every { calendarRepository.getReferenceById(any()) } returns calendarEntity
         val beers = testSubject.getBeersWithReviewByCalendarAndUser(
-                calendarEntity.id!!, userEntity.id
+            calendarEntity.id!!, userEntity.id
         )
         Assertions.assertAll(
-                { Assertions.assertNotNull(beers) },
-                { Assertions.assertEquals(1, beers.size) },
-                { Assertions.assertEquals(1, beers.first().day) },
-                { Assertions.assertNotNull(beers.first().review) },
-                { Assertions.assertNotNull(beers.first().calendar) },
-                { Assertions.assertNotNull(beers.first().beer) }
+            { Assertions.assertNotNull(beers) },
+            { Assertions.assertEquals(1, beers.size) },
+            { Assertions.assertEquals(1, beers.first().day) },
+            { Assertions.assertNotNull(beers.first().review) },
+            { Assertions.assertNotNull(beers.first().calendar) },
+            { Assertions.assertNotNull(beers.first().beer) }
         )
     }
 
@@ -108,11 +123,11 @@ internal class BeerServiceTest {
         val beers = testSubject.getBeersWithCalendar(calendarEntity.id, null)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beers) },
-                { Assertions.assertEquals(1, beers.size) },
-                { Assertions.assertEquals(1, beers.first().day) },
-                { Assertions.assertNotNull(beers.first().calendar) },
-                { Assertions.assertNotNull(beers.first().brewer) }
+            { Assertions.assertNotNull(beers) },
+            { Assertions.assertEquals(1, beers.size) },
+            { Assertions.assertEquals(1, beers.first().day) },
+            { Assertions.assertNotNull(beers.first().calendar) },
+            { Assertions.assertNotNull(beers.first().brewer) }
         )
     }
 
@@ -129,16 +144,16 @@ internal class BeerServiceTest {
         every { beerRepository.findBeerEntityByUser(any()) } returns listOf(beerEntity)
 
         val beers = testSubject.getBeersWithCalendar(
-                calendarEntity.id,
-                userEntity.email
+            calendarEntity.id,
+            userEntity.email
         )
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beers) },
-                { Assertions.assertEquals(1, beers.size) },
-                { Assertions.assertEquals(1, beers.first().day) },
-                { Assertions.assertNotNull(beers.first().calendar) },
-                { Assertions.assertNotNull(beers.first().brewer) }
+            { Assertions.assertNotNull(beers) },
+            { Assertions.assertEquals(1, beers.size) },
+            { Assertions.assertEquals(1, beers.first().day) },
+            { Assertions.assertNotNull(beers.first().calendar) },
+            { Assertions.assertNotNull(beers.first().brewer) }
         )
     }
 
@@ -148,8 +163,8 @@ internal class BeerServiceTest {
         val beer = testSubject.getById(beerEntity.id)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beer) },
-                { Assertions.assertEquals(beerEntity.id, beer?.id) }
+            { Assertions.assertNotNull(beer) },
+            { Assertions.assertEquals(beerEntity.id, beer?.id) }
         )
     }
 
@@ -224,8 +239,8 @@ internal class BeerServiceTest {
 
         val thrown = assertThrows<InsufficientAuthenticationException> { testSubject.delete(beerEntity.id) }
         Assertions.assertAll(
-                { Assertions.assertNotNull(thrown) },
-                { Assertions.assertEquals("Ikke lov å slette andres øl", thrown.message) }
+            { Assertions.assertNotNull(thrown) },
+            { Assertions.assertEquals("Ikke lov å slette andres øl", thrown.message) }
         )
     }
 
@@ -248,24 +263,24 @@ internal class BeerServiceTest {
         val beers = testSubject.getBeersWithCalendarAndReviewByDate(LocalDate.of(2023, Month.DECEMBER, 1))
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beers) },
-                { Assertions.assertEquals(1, beers.size) },
-                { Assertions.assertEquals(1, beers.first().day) },
-                { Assertions.assertNotNull(beers.first().calendar) },
-                { Assertions.assertNotNull(beers.first().brewer) }
+            { Assertions.assertNotNull(beers) },
+            { Assertions.assertEquals(1, beers.size) },
+            { Assertions.assertEquals(1, beers.first().day) },
+            { Assertions.assertNotNull(beers.first().calendar) },
+            { Assertions.assertNotNull(beers.first().brewer) }
         )
     }
 
     @Test
     fun testGetTodaysBeersWithCalendarAndReviewNovember() {
         val beers = testSubject.getBeersWithCalendarAndReviewByDate(
-                LocalDate.of(
-                        calendarEntity.year, Month.NOVEMBER, 1
-                )
+            LocalDate.of(
+                calendarEntity.year, Month.NOVEMBER, 1
+            )
         )
         Assertions.assertAll(
-                { Assertions.assertNotNull(beers) },
-                { Assertions.assertEquals(0, beers.size) }
+            { Assertions.assertNotNull(beers) },
+            { Assertions.assertEquals(0, beers.size) }
         )
     }
 

@@ -31,8 +31,19 @@ import java.util.UUID
 import java.util.function.Consumer
 
 @Service
-class BeerServiceImpl(private val beerRepository: BeerRepository, private val beerStyleRepository: BeerStyleRepository, private val calendarRepository: CalendarRepository, private val userRepository: UserRepository, mapper: BeerMapper, private val calendarMapper: CalendarMapper, private val reviewMapper: ReviewMapper, private val userWithoutChildrenMapper: UserWithoutChildrenMapper, private val excelGenerator: ExcelGenerator, private val localesService: LocalesService) : BaseServiceImpl<UUID, Beer, BeerEntity>(beerRepository, mapper),
-        BeerService {
+class BeerServiceImpl(
+    private val beerRepository: BeerRepository,
+    private val beerStyleRepository: BeerStyleRepository,
+    private val calendarRepository: CalendarRepository,
+    private val userRepository: UserRepository,
+    mapper: BeerMapper,
+    private val calendarMapper: CalendarMapper,
+    private val reviewMapper: ReviewMapper,
+    private val userWithoutChildrenMapper: UserWithoutChildrenMapper,
+    private val excelGenerator: ExcelGenerator,
+    private val localesService: LocalesService
+) : BaseServiceImpl<UUID, Beer, BeerEntity>(beerRepository, mapper),
+    BeerService {
 
     override fun getBeersWithReviewByCalendarAndUser(calendarId: UUID, userId: UUID?): Set<BeerWithCalendarDayAndReview> {
         val calendarEntity = calendarRepository.getReferenceById(calendarId)
@@ -105,13 +116,31 @@ class BeerServiceImpl(private val beerRepository: BeerRepository, private val be
     }
 
     override fun getBeersWithCalendarXlsx(calendarId: UUID?, email: String?, locale: String): ByteArray {
-        val headers = arrayOf(localesService.getString(locale, "pages.beeradmin.beername"), localesService.getString(locale, "beer.brewer"), localesService.getString(locale, "beer.style"), localesService.getString(locale, "beer.abv"), localesService.getString(locale, "beer.archived"), localesService.getString(locale, "pages.beeradmin.year"), localesService.getString(locale, "pages.beeradmin.calendar"), localesService.getString(locale, "pages.beeradmin.dayincalendar"))
+        val headers = arrayOf(
+            localesService.getString(locale, "pages.beeradmin.beername"),
+            localesService.getString(locale, "beer.brewer"),
+            localesService.getString(locale, "beer.style"),
+            localesService.getString(locale, "beer.abv"),
+            localesService.getString(locale, "beer.archived"),
+            localesService.getString(locale, "pages.beeradmin.year"),
+            localesService.getString(locale, "pages.beeradmin.calendar"),
+            localesService.getString(locale, "pages.beeradmin.dayincalendar")
+        )
         val rowData = getBeersWithCalendar(calendarId, email).map { beerWithCalendarAndDay ->
             val beer = beerWithCalendarAndDay.beer
             val calendar = beerWithCalendarAndDay.calendar
-            arrayOf<Any>(beer.name, beer.brewer.name(), beer.style, beer.abv, if (beer.archived) localesService.getString(locale, "common.no") else localesService.getString(locale, "common.yes"), calendar?.year
-                    ?: "", calendar?.name
-                    ?: "", if (calendar != null) beerWithCalendarAndDay.day else "")
+            arrayOf<Any>(
+                beer.name,
+                beer.brewer.name(),
+                beer.style,
+                beer.abv,
+                if (beer.archived) localesService.getString(locale, "common.no") else localesService.getString(locale, "common.yes"),
+                calendar?.year
+                    ?: "",
+                calendar?.name
+                    ?: "",
+                if (calendar != null) beerWithCalendarAndDay.day else ""
+            )
         }.toList()
         val sheetname = localesService.getString(locale, "menu.allbeers")
         return excelGenerator.generateReport(sheetname, headers, rowData)
@@ -171,13 +200,13 @@ class BeerServiceImpl(private val beerRepository: BeerRepository, private val be
                                 if (beerCalendar != null) {
                                     val reviewEntity = beerCalendar.beer.reviews.filter { it.user.id === user.id }.map { reviewMapper.entityToModel(it) }.first()
                                     beers.add(
-                                            BeerWithCalendarDayAndReview(
-                                                    mapper.entityToModel(beerCalendar.beer),
-                                                    calendarMapper.entityToModel(calendarEntity),
-                                                    userWithoutChildrenMapper.entityToModel(beerCalendar.beer.user),
-                                                    beerCalendar.day,
-                                                    reviewEntity
-                                            )
+                                        BeerWithCalendarDayAndReview(
+                                            mapper.entityToModel(beerCalendar.beer),
+                                            calendarMapper.entityToModel(calendarEntity),
+                                            userWithoutChildrenMapper.entityToModel(beerCalendar.beer.user),
+                                            beerCalendar.day,
+                                            reviewEntity
+                                        )
                                     )
                                 }
                             }

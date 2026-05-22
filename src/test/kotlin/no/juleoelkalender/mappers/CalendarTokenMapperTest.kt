@@ -4,7 +4,9 @@ import no.juleoelkalender.entity.CalendarTokenEntity
 import no.juleoelkalender.getCalendarToken
 import no.juleoelkalender.getCalendarTokenEntity
 import no.juleoelkalender.model.CalendarToken
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -24,17 +26,17 @@ internal class CalendarTokenMapperTest {
     fun testEntityToModel() {
         val calendarToken = testSubject.entityToModel(calendarTokenEntity)
         assertAll(
-                { assertNotNull(calendarToken) },
-                { assertEquals(calendarTokenEntity.name, calendarToken.name) },
-                { assertEquals(calendarTokenEntity.id, calendarToken.id) })
+            { assertNotNull(calendarToken) },
+            { assertEquals(calendarTokenEntity.name, calendarToken.name) },
+            { assertEquals(calendarTokenEntity.id, calendarToken.id) })
     }
 
     @Test
     fun testModelToEntity() {
         val calendarTokenEntity = testSubject.modelToEntity(calendarToken)
         assertAll(
-                { assertNotNull(calendarTokenEntity) },
-                { assertEquals(calendarToken.name, calendarTokenEntity.name) },
-                { assertEquals(calendarToken.id, calendarTokenEntity.id) })
+            { assertNotNull(calendarTokenEntity) },
+            { assertEquals(calendarToken.name, calendarTokenEntity.name) },
+            { assertEquals(calendarToken.id, calendarTokenEntity.id) })
     }
 }

@@ -11,7 +11,9 @@ import no.juleoelkalender.model.BeerWithCalendarAndDay
 import no.juleoelkalender.model.Calendar
 import no.juleoelkalender.model.User
 import no.juleoelkalender.service.impl.DashboardServiceImpl
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.actuate.info.InfoEndpoint
@@ -80,10 +82,10 @@ internal class DashboardServiceTest {
 
         val dashboardData = testSubject.dashboardData
         assertAll(
-                { assertNotNull(dashboardData) },
-                { assertEquals("1", dashboardData.backendVersion) },
-                { assertNotNull(dashboardData.backendBuildTime) },
-                { assertEquals(now.year, dashboardData.backendBuildTime.year) }
+            { assertNotNull(dashboardData) },
+            { assertEquals("1", dashboardData.backendVersion) },
+            { assertNotNull(dashboardData.backendBuildTime) },
+            { assertEquals(now.year, dashboardData.backendBuildTime.year) }
         )
     }
 }

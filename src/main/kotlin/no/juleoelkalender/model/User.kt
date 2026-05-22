@@ -9,10 +9,12 @@ import org.springframework.security.core.userdetails.UserDetails
 import java.time.ZonedDateTime
 import java.util.UUID
 
-data class User(var id: UUID?, var firstName: String, var middleName: String?, var lastName: String, var email: @Email String, @JsonIgnore var pwd: String,
-                var area: String?, var role: Role, var locked: Boolean, var beers: Set<Beer> = setOf(), var calendarToken: Set<CalendarToken> = setOf(),
-                var lastLoginDate: ZonedDateTime?, var createdDate: ZonedDateTime, var facebookUserId: String?, var imageUrl: String?,
-                var imageHeight: Int?, var imageWidth: Int?, var imageSilhouette: Boolean) : UserDetails {
+data class User(
+    var id: UUID?, var firstName: String, var middleName: String?, var lastName: String, var email: @Email String, @JsonIgnore var pwd: String,
+    var area: String?, var role: Role, var locked: Boolean, var beers: Set<Beer> = setOf(), var calendarToken: Set<CalendarToken> = setOf(),
+    var lastLoginDate: ZonedDateTime?, var createdDate: ZonedDateTime, var facebookUserId: String?, var imageUrl: String?,
+    var imageHeight: Int?, var imageWidth: Int?, var imageSilhouette: Boolean
+) : UserDetails {
 
     @get:JsonIgnore
     val name: String
@@ -38,8 +40,8 @@ data class User(var id: UUID?, var firstName: String, var middleName: String?, v
     @get:JsonIgnore
     val userWithoutChildren: UserWithoutChildren
         get() = UserWithoutChildren(
-                id = id, firstName = firstName, middleName = middleName, lastName = lastName, email = email, password = pwd, area = area, role = role,
-                locked = locked, calendarToken = calendarToken, lastLoginDate = lastLoginDate, createdDate = createdDate, facebookUserId = facebookUserId, imageUrl = imageUrl, imageHeight = imageHeight,
-                imageWidth = imageWidth, imageSilhouette = imageSilhouette
+            id = id, firstName = firstName, middleName = middleName, lastName = lastName, email = email, password = pwd, area = area, role = role,
+            locked = locked, calendarToken = calendarToken, lastLoginDate = lastLoginDate, createdDate = createdDate, facebookUserId = facebookUserId, imageUrl = imageUrl, imageHeight = imageHeight,
+            imageWidth = imageWidth, imageSilhouette = imageSilhouette
         )
 }

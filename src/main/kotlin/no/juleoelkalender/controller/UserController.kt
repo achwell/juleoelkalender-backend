@@ -11,7 +11,14 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.UUID
@@ -31,13 +38,13 @@ class UserController(private val userService: UserService, private val localesSe
     fun getAllUsersExport(@PathVariable locale: String): ResponseEntity<ByteArray> {
         val fileName = localesService.getString(locale, "pages.users.excelexportfilename")
         return ResponseEntity.ok()
-                .contentType(
-                        MediaType.parseMediaType(
-                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        )
+            .contentType(
+                MediaType.parseMediaType(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
-                .body(userService.getUsersXlsx(locale))
+            )
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
+            .body(userService.getUsersXlsx(locale))
     }
 
     @GetMapping(path = ["/{id}"])
@@ -68,7 +75,7 @@ class UserController(private val userService: UserService, private val localesSe
     @ApiResponse(description = "Oppdater bruker")
     fun updateUser(@PathVariable id: UUID, @RequestBody user: User): ResponseEntity<User> {
         val updated = userService.update(id, user)
-                ?: throw NotFoundException("User with id $id not found")
+            ?: throw NotFoundException("User with id $id not found")
         return ResponseEntity.ok(updated)
     }
 

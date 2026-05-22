@@ -15,15 +15,20 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 import java.net.URISyntaxException
 
 @RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
-        private val authenticationService: AuthenticationService,
-        private val userService: UserService
+    private val authenticationService: AuthenticationService,
+    private val userService: UserService
 ) {
     @PostMapping("/register")
     @PreAuthorize("isAnonymous()")
@@ -35,7 +40,7 @@ class AuthController(
     @PostMapping("/authenticate")
     @PreAuthorize("isAnonymous()")
     fun authenticate(
-            @RequestBody request: AuthenticationRequest
+        @RequestBody request: AuthenticationRequest
     ): ResponseEntity<AuthenticationResponse> {
         return ResponseEntity.ok(authenticationService.authenticate(request))
     }
@@ -43,7 +48,7 @@ class AuthController(
     @PostMapping("/facebookauthenticate")
     @PreAuthorize("isAnonymous()")
     fun loginWithFacebook(
-            @RequestBody request: FacebookAuthenticationRequest
+        @RequestBody request: FacebookAuthenticationRequest
     ): ResponseEntity<AuthenticationResponse> {
         return ResponseEntity.ok(authenticationService.facebookAuthenticate(request))
     }
@@ -51,7 +56,7 @@ class AuthController(
     @PostMapping("/googleauthenticate")
     @PreAuthorize("isAnonymous()")
     fun loginWithGoogle(
-            @RequestBody request: GoogleAuthenticationRequest
+        @RequestBody request: GoogleAuthenticationRequest
     ): ResponseEntity<AuthenticationResponse> {
         return ResponseEntity.ok(authenticationService.googleAuthenticate(request))
     }

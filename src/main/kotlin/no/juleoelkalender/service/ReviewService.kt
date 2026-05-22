@@ -1,6 +1,11 @@
 package no.juleoelkalender.service
 
-import no.juleoelkalender.model.*
+import no.juleoelkalender.model.Beer
+import no.juleoelkalender.model.Calendar
+import no.juleoelkalender.model.Review
+import no.juleoelkalender.model.ReviewData
+import no.juleoelkalender.model.ReviewWithUser
+import no.juleoelkalender.model.UserWithoutChildren
 import java.util.UUID
 
 interface ReviewService : BaseService<UUID, Review> {

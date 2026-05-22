@@ -15,8 +15,8 @@ import java.util.UUID
 
 @Service
 class BeerCalendarServiceImpl(
-        private val beerCalendarRepository: BeerCalendarRepository, private val beerRepository: BeerRepository,
-        private val calendarRepository: CalendarRepository, mapper: BeerCalendarMapper
+    private val beerCalendarRepository: BeerCalendarRepository, private val beerRepository: BeerRepository,
+    private val calendarRepository: CalendarRepository, mapper: BeerCalendarMapper
 ) : BaseServiceImpl<UUID, BeerCalendar, BeerCalendarEntity>(beerCalendarRepository, mapper), BeerCalendarService {
 
     override fun preCreate(model: BeerCalendar): BeerCalendarEntity {
@@ -34,13 +34,13 @@ class BeerCalendarServiceImpl(
 
     override fun moveBeerCalendar(calendarId: UUID, day: Int, direction: Direction) {
         val beerCalendar1 = beerCalendarRepository.findByDayAndCalendar_Id(
-                day,
-                calendarId
+            day,
+            calendarId
         )
         if (beerCalendar1 == null) {
             throw NotFoundException("BeerCalendar with id $day not found")
         }
-        if (Objects.requireNonNull<Direction?>(direction) == Direction.UP) {
+        if (Objects.requireNonNull(direction) == Direction.UP) {
             if (day > 1) {
                 beerCalendar1.day = day - 1
                 val beerCalendarEntity = beerCalendarRepository.findByDayAndCalendar_Id(day - 1, calendarId)

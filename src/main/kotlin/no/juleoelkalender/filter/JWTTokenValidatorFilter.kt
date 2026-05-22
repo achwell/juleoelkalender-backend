@@ -23,8 +23,8 @@ class JWTTokenValidatorFilter(private val jwtKey: String, private val userReposi
 
     @Throws(ServletException::class, IOException::class)
     public override fun doFilterInternal(
-            request: @NotNull HttpServletRequest,
-            response: @NotNull HttpServletResponse, filterChain: FilterChain
+        request: @NotNull HttpServletRequest,
+        response: @NotNull HttpServletResponse, filterChain: FilterChain
     ) {
         try {
             validateToken(request)
@@ -46,8 +46,8 @@ class JWTTokenValidatorFilter(private val jwtKey: String, private val userReposi
                 }
                 val authorities: String = claims["authorities"] as String
                 val auth: Authentication = UsernamePasswordAuthenticationToken(
-                        username, "",
-                        AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)
+                    username, "",
+                    AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)
                 )
                 SecurityContextHolder.getContext().authentication = auth
             } catch (e: Exception) {

@@ -4,7 +4,9 @@ import no.juleoelkalender.entity.PasswordChangeRequestEntity
 import no.juleoelkalender.getPasswordChangeRequest
 import no.juleoelkalender.getPasswordChangeRequestEntity
 import no.juleoelkalender.model.PasswordChangeRequest
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -23,28 +25,28 @@ internal class PasswordChangeRequestMapperTest {
     @Test
     fun testEntityToModel() {
         val model = testSubject.entityToModel(
-                passwordChangeRequestEntity
+            passwordChangeRequestEntity
         )
         assertAll(
-                { assertNotNull(model) }, {
-            assertEquals(
+            { assertNotNull(model) }, {
+                assertEquals(
                     passwordChangeRequestEntity.id,
                     model.id
-            )
-        },
-                { assertEquals(passwordChangeRequestEntity.email, model.email) },
-                { assertEquals(passwordChangeRequestEntity.token, model.token) })
+                )
+            },
+            { assertEquals(passwordChangeRequestEntity.email, model.email) },
+            { assertEquals(passwordChangeRequestEntity.token, model.token) })
     }
 
     @Test
     fun testModelToEntity() {
         val entity = testSubject.modelToEntity(
-                passwordChangeRequest
+            passwordChangeRequest
         )
         assertAll(
-                { assertNotNull(entity) },
-                { assertEquals(passwordChangeRequest.id, entity.id) },
-                { assertEquals(passwordChangeRequest.email, entity.email) },
-                { assertEquals(passwordChangeRequest.token, entity.token) })
+            { assertNotNull(entity) },
+            { assertEquals(passwordChangeRequest.id, entity.id) },
+            { assertEquals(passwordChangeRequest.email, entity.email) },
+            { assertEquals(passwordChangeRequest.token, entity.token) })
     }
 }

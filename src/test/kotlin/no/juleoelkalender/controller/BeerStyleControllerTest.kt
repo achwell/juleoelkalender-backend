@@ -31,11 +31,11 @@ internal class BeerStyleControllerTest {
         val beerStyles = testSubject.beerStyles
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beerStyles) },
-                { Assertions.assertNotNull(beerStyles.statusCode) },
-                { Assertions.assertNotNull(beerStyles.getBody()) },
-                { Assertions.assertEquals(1, beerStyles.getBody()!!.size) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(200), beerStyles.statusCode) }
+            { Assertions.assertNotNull(beerStyles) },
+            { Assertions.assertNotNull(beerStyles.statusCode) },
+            { Assertions.assertNotNull(beerStyles.getBody()) },
+            { Assertions.assertEquals(1, beerStyles.getBody()!!.size) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(200), beerStyles.statusCode) }
         )
     }
 
@@ -45,10 +45,10 @@ internal class BeerStyleControllerTest {
         val beerStyle = testSubject.getBeerStyleById(UUID.randomUUID())
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beerStyle) },
-                { Assertions.assertNotNull(beerStyle.statusCode) },
-                { Assertions.assertNotNull(beerStyle.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(200), beerStyle.statusCode) }
+            { Assertions.assertNotNull(beerStyle) },
+            { Assertions.assertNotNull(beerStyle.statusCode) },
+            { Assertions.assertNotNull(beerStyle.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(200), beerStyle.statusCode) }
         )
     }
 
@@ -59,10 +59,10 @@ internal class BeerStyleControllerTest {
         val beer = testSubject.createBeerStyle(beerStyle)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beer) },
-                { Assertions.assertNotNull(beer.statusCode) },
-                { Assertions.assertNotNull(beer.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(201), beer.statusCode) }
+            { Assertions.assertNotNull(beer) },
+            { Assertions.assertNotNull(beer.statusCode) },
+            { Assertions.assertNotNull(beer.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(201), beer.statusCode) }
         )
     }
 
@@ -72,10 +72,10 @@ internal class BeerStyleControllerTest {
         val beerCalendars = testSubject.updateBeerStyle(beerStyle.id!!, beerStyle)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beerCalendars) },
-                { Assertions.assertNotNull(beerCalendars.statusCode) },
-                { Assertions.assertNotNull(beerCalendars.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(200), beerCalendars.statusCode) }
+            { Assertions.assertNotNull(beerCalendars) },
+            { Assertions.assertNotNull(beerCalendars.statusCode) },
+            { Assertions.assertNotNull(beerCalendars.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(200), beerCalendars.statusCode) }
         )
     }
 
@@ -85,10 +85,10 @@ internal class BeerStyleControllerTest {
         val beerStyle = testSubject.deleteBeerStyle(beerStyle.id!!)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(beerStyle) },
-                { Assertions.assertNotNull(beerStyle.statusCode) },
-                { Assertions.assertNull(beerStyle.getBody()) },
-                { Assertions.assertEquals(HttpStatusCode.valueOf(204), beerStyle.statusCode) }
+            { Assertions.assertNotNull(beerStyle) },
+            { Assertions.assertNotNull(beerStyle.statusCode) },
+            { Assertions.assertNull(beerStyle.getBody()) },
+            { Assertions.assertEquals(HttpStatusCode.valueOf(204), beerStyle.statusCode) }
         )
     }
 }

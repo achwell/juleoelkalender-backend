@@ -1,7 +1,13 @@
 package no.juleoelkalender.utils
 
 import no.juleoelkalender.exception.ExcelGeneraionException
-import org.apache.poi.ss.usermodel.*
+import org.apache.poi.ss.usermodel.BorderStyle
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.HorizontalAlignment
+import org.apache.poi.ss.usermodel.IndexedColors
+import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
@@ -19,13 +25,13 @@ class ExcelGenerator {
         val leftAlignedStyle = createLeftAlignedStyle(wb)
         val rightAlignedStyle = createRightAlignedStyle(wb)
         val greyCenteredBoldArialWithBorderStyle = createGreyCenteredBoldArialWithBorderStyle(
-                wb,
-                boldArial
+            wb,
+            boldArial
         )
         return mapOf(
-                CustomCellStyle.RIGHT_ALIGNED to rightAlignedStyle,
-                CustomCellStyle.LEFT_ALIGNED to leftAlignedStyle,
-                CustomCellStyle.GREY_CENTERED_BOLD_ARIAL_WITH_BORDER to greyCenteredBoldArialWithBorderStyle
+            CustomCellStyle.RIGHT_ALIGNED to rightAlignedStyle,
+            CustomCellStyle.LEFT_ALIGNED to leftAlignedStyle,
+            CustomCellStyle.GREY_CENTERED_BOLD_ARIAL_WITH_BORDER to greyCenteredBoldArialWithBorderStyle
         )
     }
 
@@ -48,8 +54,8 @@ class ExcelGenerator {
     }
 
     fun createHeaderRow(
-            sheet: XSSFSheet, styles: Map<CustomCellStyle, CellStyle>,
-            vararg headers: String
+        sheet: XSSFSheet, styles: Map<CustomCellStyle, CellStyle>,
+        vararg headers: String
     ): XSSFRow {
         val row = sheet.createRow(0)
         var colNumber = 0
@@ -60,8 +66,8 @@ class ExcelGenerator {
     }
 
     fun createRow(
-            sheet: XSSFSheet, styles: Map<CustomCellStyle, CellStyle>, rowNum: Int,
-            vararg values: Any?
+        sheet: XSSFSheet, styles: Map<CustomCellStyle, CellStyle>, rowNum: Int,
+        vararg values: Any?
     ): XSSFRow {
         val row = sheet.createRow(rowNum)
         var colNr = 0
@@ -72,8 +78,8 @@ class ExcelGenerator {
     }
 
     fun createHeaderCell(
-            row: XSSFRow, columnIndex: Int, content: String?,
-            styles: Map<CustomCellStyle, CellStyle>
+        row: XSSFRow, columnIndex: Int, content: String?,
+        styles: Map<CustomCellStyle, CellStyle>
     ): XSSFCell {
         return row.createCell(columnIndex).apply {
             setCellValue(content)
@@ -82,8 +88,8 @@ class ExcelGenerator {
     }
 
     fun createContentCell(
-            row: XSSFRow, columnIndex: Int, content: Any?,
-            styles: Map<CustomCellStyle, CellStyle>
+        row: XSSFRow, columnIndex: Int, content: Any?,
+        styles: Map<CustomCellStyle, CellStyle>
     ): XSSFCell? {
         when (content) {
             is String -> {
@@ -106,32 +112,32 @@ class ExcelGenerator {
     }
 
     private fun createStringContentCell(
-            row: XSSFRow, columnIndex: Int, content: String?,
-            styles: Map<CustomCellStyle, CellStyle>
+        row: XSSFRow, columnIndex: Int, content: String?,
+        styles: Map<CustomCellStyle, CellStyle>
     ): XSSFCell = row.createCell(columnIndex).apply {
         setCellValue(content)
         setCellStyle(styles[CustomCellStyle.LEFT_ALIGNED])
     }
 
     private fun createIntegerContentCell(
-            row: XSSFRow, columnIndex: Int, content: Int,
-            styles: Map<CustomCellStyle, CellStyle>
+        row: XSSFRow, columnIndex: Int, content: Int,
+        styles: Map<CustomCellStyle, CellStyle>
     ): XSSFCell = row.createCell(columnIndex).apply {
         setCellValue(content.toDouble())
         setCellStyle(styles[CustomCellStyle.RIGHT_ALIGNED])
     }
 
     private fun createDoubleContentCell(
-            row: XSSFRow, columnIndex: Int, content: Double,
-            styles: Map<CustomCellStyle, CellStyle>
+        row: XSSFRow, columnIndex: Int, content: Double,
+        styles: Map<CustomCellStyle, CellStyle>
     ): XSSFCell = row.createCell(columnIndex).apply {
         setCellValue(content)
         setCellStyle(styles[CustomCellStyle.RIGHT_ALIGNED])
     }
 
     private fun createZonedDateTimeContentCell(
-            row: XSSFRow, columnIndex: Int, content: ZonedDateTime?,
-            styles: Map<CustomCellStyle, CellStyle>
+        row: XSSFRow, columnIndex: Int, content: ZonedDateTime?,
+        styles: Map<CustomCellStyle, CellStyle>
     ): XSSFCell = row.createCell(columnIndex).apply {
         setCellValue(content?.toLocalDateTime())
         setCellStyle(styles[CustomCellStyle.LEFT_ALIGNED])

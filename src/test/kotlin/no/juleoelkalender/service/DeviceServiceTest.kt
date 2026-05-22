@@ -5,11 +5,18 @@ import io.mockk.mockk
 import no.juleoelkalender.entity.DeviceEntity
 import no.juleoelkalender.getDevice
 import no.juleoelkalender.getDeviceEntity
-import no.juleoelkalender.mappers.*
+import no.juleoelkalender.mappers.AuthorityMapper
+import no.juleoelkalender.mappers.CalendarTokenMapper
+import no.juleoelkalender.mappers.DeviceMapper
+import no.juleoelkalender.mappers.RoleMapper
+import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.Device
 import no.juleoelkalender.repository.DeviceRepository
 import no.juleoelkalender.service.impl.DeviceServiceImpl
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.Optional
@@ -38,8 +45,8 @@ internal class DeviceServiceTest {
         every { deviceRepository.findAll() } returns listOf(deviceEntity)
         val devices = testSubject.all
         assertAll(
-                { assertNotNull(devices) },
-                { assertEquals(1, devices.size) }
+            { assertNotNull(devices) },
+            { assertEquals(1, devices.size) }
         )
     }
 
@@ -48,10 +55,10 @@ internal class DeviceServiceTest {
         every { deviceRepository.save(any()) } returns deviceEntity
         val result = testSubject.create(device)
         assertAll(
-                { assertNotNull(result) },
-                { assertEquals(device.user.id, result.user.id) },
-                { assertTrue(result.isMobile) },
-                { assertEquals(deviceEntity.browserName, result.browserName) }
+            { assertNotNull(result) },
+            { assertEquals(device.user.id, result.user.id) },
+            { assertTrue(result.isMobile) },
+            { assertEquals(deviceEntity.browserName, result.browserName) }
         )
     }
 

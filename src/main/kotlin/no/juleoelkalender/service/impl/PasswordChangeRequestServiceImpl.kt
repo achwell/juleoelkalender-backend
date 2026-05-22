@@ -20,27 +20,27 @@ import java.util.UUID
 
 @Service
 class PasswordChangeRequestServiceImpl(
-        repository: PasswordChangeRequestRepository,
-        private val emailService: EmailService, mapper: PasswordChangeRequestMapper, private val mailProperties: MailProperties,
-        @param:Value("classpath:emails/forgottenPassword.html") private val forgottenPasswordEmail: Resource
+    repository: PasswordChangeRequestRepository,
+    private val emailService: EmailService, mapper: PasswordChangeRequestMapper, private val mailProperties: MailProperties,
+    @param:Value("classpath:emails/forgottenPassword.html") private val forgottenPasswordEmail: Resource
 ) : BaseServiceImpl<UUID, PasswordChangeRequest, PasswordChangeRequestEntity>(repository, mapper), PasswordChangeRequestService {
 
     override fun preCreate(model: PasswordChangeRequest): PasswordChangeRequestEntity {
         val pcr = PasswordChangeRequest(
-                model.id,
-                model.token, model.email, ZonedDateTime.now()
+            model.id,
+            model.token, model.email, ZonedDateTime.now()
         )
 
         val expires = pcr.created.plusHours(1)
         val mailContent = ResourceReader.asString(forgottenPasswordEmail)
-                .replace($$"${base_url}", mailProperties.baseUrl!!)
-                .replace($$"${email}", pcr.email)
-                .replace($$"${token}", pcr.token)
-                .replace($$"${expires}", DateTimeFormatter.ofPattern("dd.MM.yyyy HH:SS").format(expires))
+            .replace($$"${base_url}", mailProperties.baseUrl!!)
+            .replace($$"${email}", pcr.email)
+            .replace($$"${token}", pcr.token)
+            .replace($$"${expires}", DateTimeFormatter.ofPattern("dd.MM.yyyy HH:SS").format(expires))
         try {
             emailService.sendSimpleMessage(
-                    mailProperties.from!!, pcr.email,
-                    "Glemt passord på Juleølkalender", mailContent
+                mailProperties.from!!, pcr.email,
+                "Glemt passord på Juleølkalender", mailContent
             )
         } catch (e: MessagingException) {
             log.error("Error sending mail", e)

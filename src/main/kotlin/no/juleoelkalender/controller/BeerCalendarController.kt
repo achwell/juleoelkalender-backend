@@ -7,7 +7,14 @@ import no.juleoelkalender.service.BeerCalendarService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.UUID
@@ -24,7 +31,7 @@ class BeerCalendarController(private val beerCalendarService: BeerCalendarServic
     @PreAuthorize("hasAuthority('beercalendar:read')")
     fun getBeerCalendarById(@PathVariable id: UUID): ResponseEntity<BeerCalendar> {
         val beerCalendar = beerCalendarService.getById(id)
-                ?: throw NotFoundException("BeerCalendar with id $id not found")
+            ?: throw NotFoundException("BeerCalendar with id $id not found")
         return ResponseEntity.ok(beerCalendar)
     }
 
@@ -38,8 +45,8 @@ class BeerCalendarController(private val beerCalendarService: BeerCalendarServic
     @PostMapping(path = ["/move/{calendarId}/{day}/{direction}"])
     @PreAuthorize("hasAuthority('beercalendar:update')")
     fun moveBeerCalendar(
-            @PathVariable calendarId: UUID,
-            @PathVariable day: Int, @PathVariable direction: Direction
+        @PathVariable calendarId: UUID,
+        @PathVariable day: Int, @PathVariable direction: Direction
     ): ResponseEntity<Void> {
         beerCalendarService.moveBeerCalendar(calendarId, day, direction)
         return ResponseEntity.noContent().build()
@@ -48,11 +55,11 @@ class BeerCalendarController(private val beerCalendarService: BeerCalendarServic
     @PutMapping(path = ["/{id}"])
     @PreAuthorize("hasAuthority('beercalendar:update')")
     fun updateBeerCalendar(
-            @PathVariable id: UUID,
-            @RequestBody beerCalendar: BeerCalendar
+        @PathVariable id: UUID,
+        @RequestBody beerCalendar: BeerCalendar
     ): ResponseEntity<BeerCalendar> {
         val updated = beerCalendarService.update(id, beerCalendar)
-                ?: throw NotFoundException("BeerCalendar with id $id not found")
+            ?: throw NotFoundException("BeerCalendar with id $id not found")
         return ResponseEntity.ok(updated)
     }
 

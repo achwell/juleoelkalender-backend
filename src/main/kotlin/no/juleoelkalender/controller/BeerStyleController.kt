@@ -6,7 +6,14 @@ import no.juleoelkalender.service.BeerStyleService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.UUID
@@ -24,7 +31,7 @@ class BeerStyleController(private val beerStyleService: BeerStyleService) {
     @PreAuthorize("isAuthenticated()")
     fun getBeerStyleById(@PathVariable id: UUID): ResponseEntity<BeerStyle> {
         val beerStyle = beerStyleService.getById(id)
-                ?: throw NotFoundException("BeerStyle with id $id not found")
+            ?: throw NotFoundException("BeerStyle with id $id not found")
         return ResponseEntity.ok(beerStyle)
     }
 
@@ -32,17 +39,17 @@ class BeerStyleController(private val beerStyleService: BeerStyleService) {
     @PreAuthorize("hasAuthority('beerstyle:create')")
     @Throws(URISyntaxException::class)
     fun createBeerStyle(@RequestBody beerStyle: BeerStyle): ResponseEntity<BeerStyle> {
-        return ResponseEntity.created(URI("/beers")).body<BeerStyle>(beerStyleService.create(beerStyle))
+        return ResponseEntity.created(URI("/beers")).body(beerStyleService.create(beerStyle))
     }
 
     @PutMapping(path = ["/{id}"])
     @PreAuthorize("hasAuthority('beerstyle:update')")
     fun updateBeerStyle(
-            @PathVariable id: UUID,
-            @RequestBody beerStyle: BeerStyle
+        @PathVariable id: UUID,
+        @RequestBody beerStyle: BeerStyle
     ): ResponseEntity<BeerStyle> {
         val updated = beerStyleService.update(id, beerStyle)
-                ?: throw NotFoundException("BeerStyle with id $id not found")
+            ?: throw NotFoundException("BeerStyle with id $id not found")
         return ResponseEntity.ok(updated)
     }
 

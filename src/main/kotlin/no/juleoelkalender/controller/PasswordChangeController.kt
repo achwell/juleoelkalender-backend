@@ -8,7 +8,14 @@ import no.juleoelkalender.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.UUID
@@ -16,8 +23,8 @@ import java.util.UUID
 @RestController
 @RequestMapping("/api/v1/passwordchange")
 class PasswordChangeController(
-        private val passwordChangeRequestService: PasswordChangeRequestService,
-        private val userService: UserService
+    private val passwordChangeRequestService: PasswordChangeRequestService,
+    private val userService: UserService
 ) {
     @get:PreAuthorize("isAnonymous()")
     @get:GetMapping
@@ -28,7 +35,7 @@ class PasswordChangeController(
     @PreAuthorize("isAnonymous()")
     fun getPasswordChangeRequestById(@PathVariable id: UUID): ResponseEntity<PasswordChangeRequest> {
         val passwordChangeRequest = passwordChangeRequestService.getById(id)
-                ?: throw NotFoundException("Password change request with id $id not found")
+            ?: throw NotFoundException("Password change request with id $id not found")
         return ResponseEntity.ok(passwordChangeRequest)
     }
 
@@ -36,7 +43,7 @@ class PasswordChangeController(
     @PreAuthorize("isAnonymous()")
     @Throws(URISyntaxException::class)
     fun createPasswordChangeRequest(
-            @RequestBody passwordChangeRequest: PasswordChangeRequest
+        @RequestBody passwordChangeRequest: PasswordChangeRequest
     ): ResponseEntity<PasswordChangeRequest> {
         return ResponseEntity.created(URI("/changepassword")).body(passwordChangeRequestService.create(passwordChangeRequest))
     }
@@ -44,19 +51,19 @@ class PasswordChangeController(
     @PutMapping(path = ["/{id}"])
     @PreAuthorize("isAnonymous()")
     fun updatePasswordChangeRequest(
-            @PathVariable id: UUID,
-            @RequestBody passwordChangeRequest: PasswordChangeRequest
+        @PathVariable id: UUID,
+        @RequestBody passwordChangeRequest: PasswordChangeRequest
     ): ResponseEntity<PasswordChangeRequest> {
         val updated = passwordChangeRequestService.update(id, passwordChangeRequest)
-                ?: throw NotFoundException("Password change request with id $id not found")
+            ?: throw NotFoundException("Password change request with id $id not found")
         return ResponseEntity.ok(updated)
     }
 
     @PutMapping(path = ["/{email}/{password}"])
     @PreAuthorize("isAnonymous()")
     fun updatePassword(
-            @PathVariable email: String,
-            @PathVariable password: String
+        @PathVariable email: String,
+        @PathVariable password: String
     ): ResponseEntity<User> {
         return ResponseEntity.ok(userService.updatePassword(email, password))
     }

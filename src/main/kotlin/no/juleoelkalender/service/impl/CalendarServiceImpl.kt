@@ -7,7 +7,6 @@ import no.juleoelkalender.mappers.BeerCalendarMapper
 import no.juleoelkalender.mappers.BeerMapper
 import no.juleoelkalender.mappers.CalendarMapper
 import no.juleoelkalender.mappers.CalendarTokenMapper
-import no.juleoelkalender.model.BeerCalendar
 import no.juleoelkalender.model.Calendar
 import no.juleoelkalender.model.CalendarWithBeer
 import no.juleoelkalender.repository.CalendarRepository
@@ -22,9 +21,9 @@ import kotlin.jvm.optionals.toSet
 
 @Service
 class CalendarServiceImpl(
-        repository: CalendarRepository, private val userRepository: UserRepository,
-        private val beerMapper: BeerMapper, private val beerCalendarMapper: BeerCalendarMapper, mapper: CalendarMapper,
-        private val calendarTokenMapper: CalendarTokenMapper
+    repository: CalendarRepository, private val userRepository: UserRepository,
+    private val beerMapper: BeerMapper, private val beerCalendarMapper: BeerCalendarMapper, mapper: CalendarMapper,
+    private val calendarTokenMapper: CalendarTokenMapper
 ) : BaseServiceImpl<UUID, Calendar, CalendarEntity>(repository, mapper), CalendarService {
 
     override val all: Set<Calendar>
@@ -40,14 +39,14 @@ class CalendarServiceImpl(
             for (beerCalendar in it.beerCalendars) {
                 val beer = beerCalendar.beer
                 val calendarWithBeer = CalendarWithBeer(
-                        it.id!!,
-                        it.name, it.year, it.published,
-                        it.archived,
-                        it.beerCalendars.stream().map<BeerCalendar> { entity: BeerCalendarEntity? -> beerCalendarMapper.entityToModel(entity!!) }
-                                .collect(Collectors.toSet()), calendarTokenMapper.entityToModel(
+                    it.id!!,
+                    it.name, it.year, it.published,
+                    it.archived,
+                    it.beerCalendars.stream().map { entity: BeerCalendarEntity? -> beerCalendarMapper.entityToModel(entity!!) }
+                        .collect(Collectors.toSet()), calendarTokenMapper.entityToModel(
                         it.calendarToken
-                ),
-                        beerMapper.entityToModel(beer), beerCalendar.day)
+                    ),
+                    beerMapper.entityToModel(beer), beerCalendar.day)
                 calendarWithBeers.add(calendarWithBeer)
 
             }

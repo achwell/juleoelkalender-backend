@@ -9,7 +9,11 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
-import org.springframework.security.authentication.*
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.ProviderManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -29,9 +33,11 @@ import org.springframework.web.cors.CorsConfiguration
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @EnableWebSecurity
 class SecurityConfiguration {
-    @Value($$"${app.jwt.secret_key}") private lateinit var tokenHeader: String
-    @Value($$"#{'${app.cors.origins:}'.split(',')}") private lateinit var origins: MutableList<String>
-    private lateinit var  jwtService: JwtService
+    @Value($$"${app.jwt.secret_key}")
+    private lateinit var tokenHeader: String
+    @Value($$"#{'${app.cors.origins:}'.split(',')}")
+    private lateinit var origins: MutableList<String>
+    private lateinit var jwtService: JwtService
     private lateinit var userRepository: UserRepository
 
     @Autowired
@@ -70,19 +76,19 @@ class SecurityConfiguration {
     @Bean
     fun filterChain(http: HttpSecurity, authenticationProvider: AuthenticationProvider): SecurityFilterChain {
         return http
-                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-                .cors { it.configurationSource { this.corsConfiguration } }
-                .csrf { it.disable() }
-                .addFilterBefore(JWTTokenValidatorFilter(tokenHeader, userRepository), BasicAuthenticationFilter::class.java)
-                .addFilterAfter(JWTTokenGeneratorFilter(jwtService), BasicAuthenticationFilter::class.java)
-                .authenticationProvider(authenticationProvider)
-                .authorizeHttpRequests { authorize ->
-                    authorize.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                            .requestMatchers(*WHITE_LIST).permitAll()
-                            .anyRequest().authenticated()
-                }
-                .headers { it.frameOptions { frameOptionsConfig -> it.frameOptions { frameOptionsConfig.sameOrigin() } } }
-                .httpBasic(Customizer.withDefaults()).build()
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .cors { it.configurationSource { this.corsConfiguration } }
+            .csrf { it.disable() }
+            .addFilterBefore(JWTTokenValidatorFilter(tokenHeader, userRepository), BasicAuthenticationFilter::class.java)
+            .addFilterAfter(JWTTokenGeneratorFilter(jwtService), BasicAuthenticationFilter::class.java)
+            .authenticationProvider(authenticationProvider)
+            .authorizeHttpRequests { authorize ->
+                authorize.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+                    .requestMatchers(*WHITE_LIST).permitAll()
+                    .anyRequest().authenticated()
+            }
+            .headers { it.frameOptions { frameOptionsConfig -> it.frameOptions { frameOptionsConfig.sameOrigin() } } }
+            .httpBasic(Customizer.withDefaults()).build()
     }
 
     private val corsConfiguration: CorsConfiguration
@@ -98,6 +104,28 @@ class SecurityConfiguration {
         }
 
     companion object {
-        val WHITE_LIST: Array<String> = arrayOf("/actuator", "/actuator/**", "/error", "/locales/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/**", "/api/v1/auth/addtoken", "/api/v1/auth/authenticate", "/api/v1/auth/facebookauthenticate", "/api/v1/auth/googleauthenticate", "/api/v1/auth/refresh", "/api/v1/auth/register", "/api/v1/auth/userExist", "/api/v1/auth/userExist/", "/api/v1/auth/userExist/**", "/api/v1/log", "/api/v1/log/*", "/api/v1/passwordchange", "/api/v1/passwordchange*", "/api/v1/passwordchange**/**")
+        val WHITE_LIST: Array<String> = arrayOf(
+            "/actuator",
+            "/actuator/**",
+            "/error",
+            "/locales/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/**",
+            "/api/v1/auth/addtoken",
+            "/api/v1/auth/authenticate",
+            "/api/v1/auth/facebookauthenticate",
+            "/api/v1/auth/googleauthenticate",
+            "/api/v1/auth/refresh",
+            "/api/v1/auth/register",
+            "/api/v1/auth/userExist",
+            "/api/v1/auth/userExist/",
+            "/api/v1/auth/userExist/**",
+            "/api/v1/log",
+            "/api/v1/log/*",
+            "/api/v1/passwordchange",
+            "/api/v1/passwordchange*",
+            "/api/v1/passwordchange**/**"
+        )
     }
 }

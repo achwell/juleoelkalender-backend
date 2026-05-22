@@ -30,7 +30,8 @@ fun isTokenExpired(token: String, jwtKey: String): Boolean {
 fun buildToken(extraClaims: Map<String, *>, username: String, authorities: Collection<GrantedAuthority>, jwtKey: String, jwtExpiresTimeoutMs: Long): String {
     val createdDate = DefaultClock.INSTANCE.now()
     val expirationDate = calculateExpirationDate(createdDate, jwtExpiresTimeoutMs)
-    return Jwts.builder().issuer("Juleølkalender").claims(extraClaims).subject(username).claim("username", username).claim("authorities", populateAuthorities(authorities)).issuedAt(createdDate).expiration(expirationDate).signWith(getSignInKey(jwtKey)).compact()
+    return Jwts.builder().issuer("Juleølkalender").claims(extraClaims).subject(username).claim("username", username).claim("authorities", populateAuthorities(authorities)).issuedAt(createdDate)
+        .expiration(expirationDate).signWith(getSignInKey(jwtKey)).compact()
 }
 
 private fun calculateExpirationDate(createdDate: Date, jwtExpiresTimeoutMs: Long): Date {

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("api/v1/dashboard")
 class DashboadController(
-        private val dashboardService: DashboardService,
-        private val deviceService: DeviceService
+    private val dashboardService: DashboardService,
+    private val deviceService: DeviceService
 ) {
     @get:PreAuthorize("hasAuthority('dashboard')")
     @get:GetMapping("/devices")

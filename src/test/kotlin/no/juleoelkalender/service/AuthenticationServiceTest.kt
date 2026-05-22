@@ -7,12 +7,29 @@ import io.mockk.just
 import io.mockk.mockk
 import jakarta.mail.MessagingException
 import jakarta.servlet.http.HttpServletRequest
-import no.juleoelkalender.*
 import no.juleoelkalender.config.JwtService
 import no.juleoelkalender.config.MailProperties
-import no.juleoelkalender.entity.*
+import no.juleoelkalender.entity.AuthorityEntity
+import no.juleoelkalender.entity.CalendarTokenEntity
+import no.juleoelkalender.entity.RoleEntity
+import no.juleoelkalender.entity.RoleNameEntity
+import no.juleoelkalender.entity.UserEntity
 import no.juleoelkalender.exception.InvalidTokenException
-import no.juleoelkalender.mappers.*
+import no.juleoelkalender.getAuthorityEntityUser
+import no.juleoelkalender.getCalendarTokenEntity
+import no.juleoelkalender.getRegisterRequest
+import no.juleoelkalender.getRoleEntityMaster
+import no.juleoelkalender.getRoleEntityUser
+import no.juleoelkalender.getUserEntity
+import no.juleoelkalender.getUserEntityAdmin
+import no.juleoelkalender.getUserEntityMaster
+import no.juleoelkalender.getUserEntityNoValidToken
+import no.juleoelkalender.mappers.AuthorityMapper
+import no.juleoelkalender.mappers.BeerMapper
+import no.juleoelkalender.mappers.CalendarTokenMapper
+import no.juleoelkalender.mappers.RoleMapper
+import no.juleoelkalender.mappers.UserMapper
+import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.AddTokenRequest
 import no.juleoelkalender.model.AuthenticationRequest
 import no.juleoelkalender.model.AuthenticationResponse
@@ -94,9 +111,9 @@ internal class AuthenticationServiceTest {
             supportEmail = "first@last.no"
         }
         testSubject = AuthenticationServiceImpl(
-                userRepository, calendarTokenRepository,
-                roleRepository, passwordEncoder, jwtService, authenticationManager, userMapper, roleMapper,
-                emailService, userService, mailProperties, ByteArrayResource("".toByteArray())
+            userRepository, calendarTokenRepository,
+            roleRepository, passwordEncoder, jwtService, authenticationManager, userMapper, roleMapper,
+            emailService, userService, mailProperties, ByteArrayResource("".toByteArray())
         )
     }
 
@@ -112,21 +129,21 @@ internal class AuthenticationServiceTest {
         val authenticationResponse = testSubject.register(registerRequest)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNotNull(authenticationResponse.user?.role) },
-                { Assertions.assertNull(authenticationResponse.message) },
-                { Assertions.assertEquals(userEntity.firstName, authenticationResponse.user?.firstName) },
-                { Assertions.assertEquals(userEntity.middleName, authenticationResponse.user?.middleName) },
-                { Assertions.assertEquals(userEntity.lastName, authenticationResponse.user?.lastName) },
-                { Assertions.assertEquals(userEntity.email, authenticationResponse.user?.email) },
-                {
-                    Assertions.assertEquals(
-                            userEntity.role.name.name, authenticationResponse.user?.role?.name?.name
-                    )
-                },
-                { Assertions.assertEquals(userEntity.area, authenticationResponse.user?.area) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNotNull(authenticationResponse.user?.role) },
+            { Assertions.assertNull(authenticationResponse.message) },
+            { Assertions.assertEquals(userEntity.firstName, authenticationResponse.user?.firstName) },
+            { Assertions.assertEquals(userEntity.middleName, authenticationResponse.user?.middleName) },
+            { Assertions.assertEquals(userEntity.lastName, authenticationResponse.user?.lastName) },
+            { Assertions.assertEquals(userEntity.email, authenticationResponse.user?.email) },
+            {
+                Assertions.assertEquals(
+                    userEntity.role.name.name, authenticationResponse.user?.role?.name?.name
+                )
+            },
+            { Assertions.assertEquals(userEntity.area, authenticationResponse.user?.area) }
         )
     }
 
@@ -135,17 +152,17 @@ internal class AuthenticationServiceTest {
     fun testRegisterSecondUser() {
         val calendarToken2 = CalendarTokenEntity(UUID.randomUUID(), "TOKEN2", "TOKENNAME", true, mutableSetOf(), mutableSetOf(), now, now)
         val user2 = UserEntity(
-                id = userEntity.id,
-                firstName = userEntity.firstName, middleName = userEntity.middleName,
-                lastName = userEntity.lastName, email = userEntity.email,
-                password = userEntity.password, area = userEntity.area,
-                role = userEntity.role, locked = userEntity.locked,
-                beers = userEntity.beers, devices = mutableSetOf(), calendarToken = mutableSetOf(calendarToken2),
-                reviews = userEntity.reviews, lastLoginDate = userEntity.lastLoginDate,
-                createdDate = userEntity.createdDate, updatedDate = userEntity.updatedDate,
-                facebookUserId = userEntity.facebookUserId, imageUrl = userEntity.imageUrl,
-                imageHeight = userEntity.imageHeight, imageWidth = userEntity.imageWidth,
-                imageSilhouette = userEntity.imageSilhouette
+            id = userEntity.id,
+            firstName = userEntity.firstName, middleName = userEntity.middleName,
+            lastName = userEntity.lastName, email = userEntity.email,
+            password = userEntity.password, area = userEntity.area,
+            role = userEntity.role, locked = userEntity.locked,
+            beers = userEntity.beers, devices = mutableSetOf(), calendarToken = mutableSetOf(calendarToken2),
+            reviews = userEntity.reviews, lastLoginDate = userEntity.lastLoginDate,
+            createdDate = userEntity.createdDate, updatedDate = userEntity.updatedDate,
+            facebookUserId = userEntity.facebookUserId, imageUrl = userEntity.imageUrl,
+            imageHeight = userEntity.imageHeight, imageWidth = userEntity.imageWidth,
+            imageSilhouette = userEntity.imageSilhouette
         )
         every { userRepository.findAll() } returns listOf(user2)
         every { calendarTokenRepository.findCalendarTokenByToken(any()) } returns calendarTokenEntity
@@ -155,22 +172,22 @@ internal class AuthenticationServiceTest {
         val authenticationResponse = testSubject.register(registerRequest)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNotNull(authenticationResponse.user?.role) },
-                { Assertions.assertNull(authenticationResponse.message) },
-                { Assertions.assertEquals(userEntity.firstName, authenticationResponse.user?.firstName) },
-                { Assertions.assertEquals(userEntity.middleName, authenticationResponse.user?.middleName) },
-                { Assertions.assertEquals(userEntity.lastName, authenticationResponse.user?.lastName) },
-                { Assertions.assertEquals(userEntity.email, authenticationResponse.user?.email) },
-                {
-                    Assertions.assertEquals(
-                            userEntity.role.name.name,
-                            authenticationResponse.user?.role?.name?.name
-                    )
-                },
-                { Assertions.assertEquals(userEntity.area, authenticationResponse.user?.area) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNotNull(authenticationResponse.user?.role) },
+            { Assertions.assertNull(authenticationResponse.message) },
+            { Assertions.assertEquals(userEntity.firstName, authenticationResponse.user?.firstName) },
+            { Assertions.assertEquals(userEntity.middleName, authenticationResponse.user?.middleName) },
+            { Assertions.assertEquals(userEntity.lastName, authenticationResponse.user?.lastName) },
+            { Assertions.assertEquals(userEntity.email, authenticationResponse.user?.email) },
+            {
+                Assertions.assertEquals(
+                    userEntity.role.name.name,
+                    authenticationResponse.user?.role?.name?.name
+                )
+            },
+            { Assertions.assertEquals(userEntity.area, authenticationResponse.user?.area) }
         )
     }
 
@@ -181,9 +198,9 @@ internal class AuthenticationServiceTest {
         val authenticationResponse = AtomicReference<AuthenticationResponse>()
         val thrown = assertThrows<RuntimeException> { authenticationResponse.set(testSubject.register(registerRequest)) }
         Assertions.assertAll(
-                { Assertions.assertNull(authenticationResponse.get()) },
-                { Assertions.assertNotNull(thrown) },
-                { Assertions.assertEquals("Brukeren finnes allerede", thrown.message) }
+            { Assertions.assertNull(authenticationResponse.get()) },
+            { Assertions.assertNotNull(thrown) },
+            { Assertions.assertEquals("Brukeren finnes allerede", thrown.message) }
         )
     }
 
@@ -194,91 +211,91 @@ internal class AuthenticationServiceTest {
         val authenticationResponse = AtomicReference<AuthenticationResponse?>()
         val thrown = assertThrows<RuntimeException> { authenticationResponse.set(testSubject.register(registerRequest)) }
         Assertions.assertAll(
-                { Assertions.assertNull(authenticationResponse.get()) },
-                { Assertions.assertNotNull(thrown) },
-                { Assertions.assertEquals("Ugyldig token", thrown.message) }
+            { Assertions.assertNull(authenticationResponse.get()) },
+            { Assertions.assertNotNull(thrown) },
+            { Assertions.assertEquals("Ugyldig token", thrown.message) }
         )
     }
 
     @Test
     fun testAuthenticateOK() {
         val request = AuthenticationRequest(
-                registerRequest.email,
-                registerRequest.password
+            registerRequest.email,
+            registerRequest.password
         )
         val authentication: Authentication = UsernamePasswordAuthenticationToken(
-                registerRequest.email,
-                registerRequest.password
+            registerRequest.email,
+            registerRequest.password
         )
         every { authenticationManager.authenticate(authentication) } returns authentication
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
         val authenticationResponse = testSubject.authenticate(request)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNotNull(authenticationResponse.user?.role) },
-                { Assertions.assertNull(authenticationResponse.message) },
-                { Assertions.assertEquals(userEntity.firstName, authenticationResponse.user?.firstName) },
-                { Assertions.assertEquals(userEntity.middleName, authenticationResponse.user?.middleName) },
-                { Assertions.assertEquals(userEntity.lastName, authenticationResponse.user?.lastName) },
-                { Assertions.assertEquals(userEntity.email, authenticationResponse.user?.email) },
-                {
-                    Assertions.assertEquals(
-                            userEntity.role.name.name, authenticationResponse.user?.role?.name?.name
-                    )
-                },
-                { Assertions.assertEquals(userEntity.area, authenticationResponse.user?.area) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNotNull(authenticationResponse.user?.role) },
+            { Assertions.assertNull(authenticationResponse.message) },
+            { Assertions.assertEquals(userEntity.firstName, authenticationResponse.user?.firstName) },
+            { Assertions.assertEquals(userEntity.middleName, authenticationResponse.user?.middleName) },
+            { Assertions.assertEquals(userEntity.lastName, authenticationResponse.user?.lastName) },
+            { Assertions.assertEquals(userEntity.email, authenticationResponse.user?.email) },
+            {
+                Assertions.assertEquals(
+                    userEntity.role.name.name, authenticationResponse.user?.role?.name?.name
+                )
+            },
+            { Assertions.assertEquals(userEntity.area, authenticationResponse.user?.area) }
         )
     }
 
     @Test
     fun testAuthenticateBadCredentials() {
         val request = AuthenticationRequest(
-                registerRequest.email,
-                registerRequest.password
+            registerRequest.email,
+            registerRequest.password
         )
         val authentication: Authentication = UsernamePasswordAuthenticationToken(request.email, request.password)
         every { authenticationManager.authenticate(authentication) } throws BadCredentialsException("Bad Credentials")
         val authenticationResponse = AtomicReference<AuthenticationResponse>()
         val thrown = assertThrows<BadCredentialsException> { authenticationResponse.set(testSubject.authenticate(request)) }
         Assertions.assertAll(
-                { Assertions.assertNull(authenticationResponse.get()) },
-                { Assertions.assertNotNull(thrown) },
-                { Assertions.assertEquals("Bad Credentials", thrown.message) }
+            { Assertions.assertNull(authenticationResponse.get()) },
+            { Assertions.assertNotNull(thrown) },
+            { Assertions.assertEquals("Bad Credentials", thrown.message) }
         )
     }
 
     @Test
     fun testAuthenticateNoValidToken() {
         val request = AuthenticationRequest(
-                registerRequest.email,
-                registerRequest.password
+            registerRequest.email,
+            registerRequest.password
         )
         val authentication: Authentication = UsernamePasswordAuthenticationToken(
-                registerRequest.email,
-                registerRequest.password
+            registerRequest.email,
+            registerRequest.password
         )
         every { authenticationManager.authenticate(authentication) } returns authentication
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntityNoValidToken
         val authenticationResponse = AtomicReference<AuthenticationResponse>()
         val thrown = assertThrows<InvalidTokenException> { authenticationResponse.set(testSubject.authenticate(request)) }
         Assertions.assertAll(
-                { Assertions.assertNull(authenticationResponse.get()) },
-                { Assertions.assertNotNull(thrown) },
-                { Assertions.assertEquals("Ingen gyldig token", thrown.message) }
+            { Assertions.assertNull(authenticationResponse.get()) },
+            { Assertions.assertNotNull(thrown) },
+            { Assertions.assertEquals("Ingen gyldig token", thrown.message) }
         )
     }
 
     @Test
     fun testRefresh() {
         val token = buildToken(
-                extraClaims = emptyMap<String, Any>(),
-                username = authorityEntityUser.name,
-                authorities = listOf(SimpleGrantedAuthority(RoleNameEntity.ROLE_USER.name)),
-                jwtKey = jwtKey,
-                jwtExpiresTimeoutMs = jwtExpiresTimeoutMs
+            extraClaims = emptyMap<String, Any>(),
+            username = authorityEntityUser.name,
+            authorities = listOf(SimpleGrantedAuthority(RoleNameEntity.ROLE_USER.name)),
+            jwtKey = jwtKey,
+            jwtExpiresTimeoutMs = jwtExpiresTimeoutMs
         )
         every { request.getHeader(HttpHeaders.AUTHORIZATION) } returns "Bearer $token"
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
@@ -286,22 +303,22 @@ internal class AuthenticationServiceTest {
         val authenticationResponse = testSubject.refresh(request)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNotNull(authenticationResponse.user?.role) },
-                { Assertions.assertNull(authenticationResponse.message) },
-                { Assertions.assertEquals(userEntity.firstName, authenticationResponse.user?.firstName) },
-                { Assertions.assertEquals(userEntity.middleName, authenticationResponse.user?.middleName) },
-                { Assertions.assertEquals(userEntity.lastName, authenticationResponse.user?.lastName) },
-                { Assertions.assertEquals(userEntity.email, authenticationResponse.user?.email) },
-                {
-                    Assertions.assertEquals(
-                            userEntity.role.name.name,
-                            authenticationResponse.user?.role?.name?.name
-                    )
-                },
-                { Assertions.assertEquals(userEntity.area, authenticationResponse.user?.area) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNotNull(authenticationResponse.user?.role) },
+            { Assertions.assertNull(authenticationResponse.message) },
+            { Assertions.assertEquals(userEntity.firstName, authenticationResponse.user?.firstName) },
+            { Assertions.assertEquals(userEntity.middleName, authenticationResponse.user?.middleName) },
+            { Assertions.assertEquals(userEntity.lastName, authenticationResponse.user?.lastName) },
+            { Assertions.assertEquals(userEntity.email, authenticationResponse.user?.email) },
+            {
+                Assertions.assertEquals(
+                    userEntity.role.name.name,
+                    authenticationResponse.user?.role?.name?.name
+                )
+            },
+            { Assertions.assertEquals(userEntity.area, authenticationResponse.user?.area) }
         )
     }
 
@@ -310,10 +327,10 @@ internal class AuthenticationServiceTest {
         every { request.getHeader(HttpHeaders.AUTHORIZATION) } returns null
         val authenticationResponse = testSubject.refresh(request)
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNull(authenticationResponse.token) },
-                { Assertions.assertNull(authenticationResponse.user) },
-                { Assertions.assertNull(authenticationResponse.message) },
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNull(authenticationResponse.token) },
+            { Assertions.assertNull(authenticationResponse.user) },
+            { Assertions.assertNull(authenticationResponse.message) },
         )
     }
 
@@ -322,10 +339,10 @@ internal class AuthenticationServiceTest {
         every { request.getHeader(HttpHeaders.AUTHORIZATION) } returns "HEI"
         val authenticationResponse: AuthenticationResponse = testSubject.refresh(request)
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNull(authenticationResponse.token) },
-                { Assertions.assertNull(authenticationResponse.user) },
-                { Assertions.assertNull(authenticationResponse.message) },
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNull(authenticationResponse.token) },
+            { Assertions.assertNull(authenticationResponse.user) },
+            { Assertions.assertNull(authenticationResponse.message) },
         )
     }
 
@@ -337,20 +354,20 @@ internal class AuthenticationServiceTest {
         every { jwtService.isTokenValid(any(), any()) } throws MalformedJwtException("Malformed protected header JSON: Unable to deserialize: Unexpected character")
         val thrown = assertThrows<MalformedJwtException> { testSubject.refresh(request) }
         Assertions.assertAll(
-                { Assertions.assertNotNull(thrown) },
-                { assertTrue(thrown.message!!.startsWith("Malformed protected header JSON: Unable to deserialize: Unexpected character")) }
+            { Assertions.assertNotNull(thrown) },
+            { assertTrue(thrown.message!!.startsWith("Malformed protected header JSON: Unable to deserialize: Unexpected character")) }
         )
     }
 
     @Test
     fun testFacebookAuthenticateExistingUser() {
         val facebookAuthenticationRequest = FacebookAuthenticationRequest(
-                id = "1",
-                firstName = userEntity.firstName,
-                middleName = userEntity.middleName,
-                lastName = userEntity.lastName,
-                email = userEntity.email,
-                picture = FacebookPicture(FacebookPictureData(url = "https://example.com", height = 50, width = 50, isSilhouette = false))
+            id = "1",
+            firstName = userEntity.firstName,
+            middleName = userEntity.middleName,
+            lastName = userEntity.lastName,
+            email = userEntity.email,
+            picture = FacebookPicture(FacebookPictureData(url = "https://example.com", height = 50, width = 50, isSilhouette = false))
         )
         every { userRepository.findByFacebookUserId(any()) } returns userEntity
         every { userService.update(any(), any()) } returns userMapper.entityToModel(userEntity)
@@ -360,22 +377,22 @@ internal class AuthenticationServiceTest {
 
         val authenticationResponse: AuthenticationResponse = testSubject.facebookAuthenticate(facebookAuthenticationRequest)
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNull(authenticationResponse.message) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNull(authenticationResponse.message) }
         )
     }
 
     @Test
     fun testFacebookAuthenticateExistingUserNoImage() {
         val facebookAuthenticationRequest = FacebookAuthenticationRequest(
-                id = "1",
-                firstName = userEntity.firstName,
-                middleName = userEntity.middleName,
-                lastName = userEntity.lastName,
-                email = userEntity.email,
-                picture = null
+            id = "1",
+            firstName = userEntity.firstName,
+            middleName = userEntity.middleName,
+            lastName = userEntity.lastName,
+            email = userEntity.email,
+            picture = null
         )
 
         every { userRepository.findByFacebookUserId(any()) } returns userEntity
@@ -386,22 +403,22 @@ internal class AuthenticationServiceTest {
 
         val authenticationResponse: AuthenticationResponse = testSubject.facebookAuthenticate(facebookAuthenticationRequest)
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNull(authenticationResponse.message) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNull(authenticationResponse.message) }
         )
     }
 
     @Test
     fun testFacebookAuthenticateNewUser() {
         val facebookAuthenticationRequest = FacebookAuthenticationRequest(
-                "1",
-                userEntity.firstName,
-                userEntity.middleName,
-                userEntity.lastName,
-                userEntity.email,
-                null
+            "1",
+            userEntity.firstName,
+            userEntity.middleName,
+            userEntity.lastName,
+            userEntity.email,
+            null
         )
 
         every { userRepository.findByFacebookUserId(any()) } returns null
@@ -414,10 +431,10 @@ internal class AuthenticationServiceTest {
         val authenticationResponse = testSubject.facebookAuthenticate(facebookAuthenticationRequest)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNull(authenticationResponse.message) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNull(authenticationResponse.message) }
         )
     }
 
@@ -432,10 +449,10 @@ internal class AuthenticationServiceTest {
         val authenticationResponse = testSubject.googleAuthenticate(authenticationRequest)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNull(authenticationResponse.message) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNull(authenticationResponse.message) }
         )
     }
 
@@ -451,10 +468,10 @@ internal class AuthenticationServiceTest {
         val authenticationResponse = testSubject.googleAuthenticate(authenticationRequest)
 
         Assertions.assertAll(
-                { Assertions.assertNotNull(authenticationResponse) },
-                { Assertions.assertNotNull(authenticationResponse.token) },
-                { Assertions.assertNotNull(authenticationResponse.user) },
-                { Assertions.assertNull(authenticationResponse.message) }
+            { Assertions.assertNotNull(authenticationResponse) },
+            { Assertions.assertNotNull(authenticationResponse.token) },
+            { Assertions.assertNotNull(authenticationResponse.user) },
+            { Assertions.assertNull(authenticationResponse.message) }
         )
     }
 
@@ -482,8 +499,8 @@ internal class AuthenticationServiceTest {
 
         val thrown = assertThrows<UsernameNotFoundException> { testSubject.addtoken(AddTokenRequest(email, token)) }
         Assertions.assertAll(
-                { Assertions.assertNotNull(thrown) },
-                { Assertions.assertEquals("User not found", thrown.message) }
+            { Assertions.assertNotNull(thrown) },
+            { Assertions.assertEquals("User not found", thrown.message) }
         )
     }
 }

@@ -4,7 +4,9 @@ import no.juleoelkalender.entity.BeerEntity
 import no.juleoelkalender.getBeer
 import no.juleoelkalender.getBeerEntity
 import no.juleoelkalender.model.Beer
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -25,9 +27,9 @@ internal class BeerMapperTest {
     fun testEntityToModel() {
         val beer = testSubject.entityToModel(beerEntity)
         assertAll(
-                { assertNotNull(beer) },
-                { assertEquals(beerEntity.user.id, beer.brewer.id) },
-                { assertEquals(beerEntity.user.email, beer.brewer.email) }
+            { assertNotNull(beer) },
+            { assertEquals(beerEntity.user.id, beer.brewer.id) },
+            { assertEquals(beerEntity.user.email, beer.brewer.email) }
         )
     }
 
@@ -35,9 +37,9 @@ internal class BeerMapperTest {
     fun testModelToEntity() {
         val beerEntity = testSubject.modelToEntity(beer)
         assertAll(
-                { assertNotNull(beerEntity) },
-                { assertEquals(beer.brewer.id, beerEntity.user.id) },
-                { assertEquals(beer.brewer.email, beerEntity.user.email) }
+            { assertNotNull(beerEntity) },
+            { assertEquals(beer.brewer.id, beerEntity.user.id) },
+            { assertEquals(beer.brewer.email, beerEntity.user.email) }
         )
     }
 }

@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException
 import jakarta.servlet.http.HttpServletRequest
 import no.juleoelkalender.config.JwtService
 import no.juleoelkalender.config.MailProperties
+import no.juleoelkalender.entity.CalendarTokenEntity
 import no.juleoelkalender.entity.RoleNameEntity
 import no.juleoelkalender.entity.UserEntity
 import no.juleoelkalender.exception.InvalidTokenException
@@ -11,7 +12,12 @@ import no.juleoelkalender.exception.NotFoundException
 import no.juleoelkalender.exception.UserExistException
 import no.juleoelkalender.mappers.RoleMapper
 import no.juleoelkalender.mappers.UserMapper
-import no.juleoelkalender.model.*
+import no.juleoelkalender.model.AddTokenRequest
+import no.juleoelkalender.model.AuthenticationRequest
+import no.juleoelkalender.model.AuthenticationResponse
+import no.juleoelkalender.model.CalendarToken
+import no.juleoelkalender.model.RegisterRequest
+import no.juleoelkalender.model.User
 import no.juleoelkalender.model.externalauth.FacebookAuthenticationRequest
 import no.juleoelkalender.model.externalauth.GoogleAuthenticationRequest
 import no.juleoelkalender.repository.CalendarTokenRepository
@@ -41,236 +47,242 @@ import java.time.ZonedDateTime
 
 @Service
 class AuthenticationServiceImpl(
-        private val userRepository: UserRepository,
-        private val calendarTokenRepository: CalendarTokenRepository, private val roleRepository: RoleRepository,
-        private val passwordEncoder: PasswordEncoder, private val jwtService: JwtService,
-        private val authenticationManager: AuthenticationManager, private val userMapper: UserMapper, private val roleMapper: RoleMapper,
-        private val emailService: EmailService, private val userService: UserService, private val mailProperties: MailProperties,
-        @param:Value("classpath:emails/welcome.html") private val welcomeEmail: Resource
+    private val userRepository: UserRepository,
+    private val calendarTokenRepository: CalendarTokenRepository, private val roleRepository: RoleRepository,
+    private val passwordEncoder: PasswordEncoder, private val jwtService: JwtService,
+    private val authenticationManager: AuthenticationManager, private val userMapper: UserMapper, private val roleMapper: RoleMapper,
+    private val emailService: EmailService, private val userService: UserService, private val mailProperties: MailProperties,
+    @param:Value("classpath:emails/welcome.html") private val welcomeEmail: Resource
 ) : AuthenticationService {
 
     @Throws(MessagingException::class)
     override fun register(request: RegisterRequest): AuthenticationResponse {
-        val allUsers = userRepository.findAll()
-        val firstUser = allUsers.isEmpty()
-        var userEntity: UserEntity? = null
-        if (!firstUser) {
-            userEntity = allUsers.firstOrNull { it.email.equals(request.email, ignoreCase = true) }
-        }
-        val token = calendarTokenRepository.findCalendarTokenByToken(request.calendarToken)
-                ?: throw InvalidTokenException("Ugyldig token")
         val now = ZonedDateTime.now()
-        if (userEntity == null) {
-            val role = roleRepository.findRoleEntityByName(
-                    if (firstUser) RoleNameEntity.ROLE_MASTER else RoleNameEntity.ROLE_USER
-            )
-            userEntity = userRepository.save(
-                    UserEntity(
-                            id = null,
-                            firstName = request.firstName,
-                            middleName = request.middleName,
-                            lastName = request.lastName,
-                            email = request.email,
-                            password = passwordEncoder.encode(request.password)!!,
-                            area = request.area,
-                            role = role!!,
-                            locked = false,
-                            beers = mutableSetOf(),
-                            devices = mutableSetOf(),
-                            calendarToken = mutableSetOf(token),
-                            reviews = mutableSetOf(),
-                            lastLoginDate = null,
-                            createdDate = now,
-                            updatedDate = now,
-                            facebookUserId = null,
-                            imageUrl = null,
-                            imageHeight = null,
-                            imageWidth = null,
-                            imageSilhouette = false
-                    )
-            )
-        } else {
-            val newToken = userEntity.calendarToken.any { it.id != token.id }
-            if (newToken) {
-                userEntity.calendarToken.add(token)
-                userEntity = userRepository.save(userEntity)
-            } else {
-                throw UserExistException("Brukeren finnes allerede")
-            }
-        }
-        val user = userMapper.entityToModel(userEntity)
-        val calendarTokens = user.calendarToken.filter(CalendarToken::active).toSet()
-        user.calendarToken = calendarTokens
-        val jwtToken = jwtService.generateToken(user)
-        val mailContent = asString(welcomeEmail)
-                .replace($$"${base_url}", mailProperties.baseUrl!!)
-                .replace($$"${support_email}", mailProperties.supportEmail!!)
-                .replace($$"${calendar_token_name}", user.calendarToken.first().name)
-                .replace($$"${year}", now.year.toString())
-        emailService.sendSimpleMessage(
-                mailProperties.from!!, user.email,
-                "Velkommen til Juleølkalender!", mailContent
-        )
-        return AuthenticationResponse(jwtToken, user, null)
+        val allUsers = userRepository.findAll()
+        val isFirstUser = allUsers.isEmpty()
+        val existingUser = allUsers.firstOrNull { it.email.equals(request.email, ignoreCase = true) }
+        val calendarToken = requireCalendarToken(request.calendarToken)
+
+        val savedUser = existingUser?.let { addCalendarTokenToExistingUser(it, calendarToken) }
+            ?: createRegisteredUser(request, calendarToken, isFirstUser, now)
+
+        val user = toUserWithActiveTokens(savedUser)
+        sendWelcomeEmail(user, now)
+        return responseWithToken(user)
     }
 
     override fun authenticate(request: AuthenticationRequest): AuthenticationResponse {
-        authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken(
-                        request.email,
-                        request.password
-                )
-        )
-        val userEntity = userRepository.findByEmailIgnoreCase(request.email)
-                ?: throw UsernameNotFoundException("User not found")
-        if (userEntity.calendarToken.none { it.active }) {
-            throw InvalidTokenException("Ingen gyldig token")
-        }
+        authenticateCredentials(request.email, request.password)
+        val userEntity = findUserByEmail(request.email)
+        requireActiveCalendarToken(userEntity)
         userEntity.lastLoginDate = ZonedDateTime.now()
-        userRepository.save(userEntity)
-        val user = userMapper.entityToModel(userEntity)
-        val calendarTokens = user.calendarToken.filter { it.active }.toSet()
-        user.calendarToken = calendarTokens
-        val jwtToken = jwtService.generateToken(user)
-        return AuthenticationResponse(jwtToken, user, null)
+        return responseWithToken(toUserWithActiveTokens(userRepository.save(userEntity)))
     }
 
     override fun facebookAuthenticate(request: FacebookAuthenticationRequest): AuthenticationResponse {
-        var user = getExistingUser(request)
         val now = ZonedDateTime.now()
-        if (user != null) {
-            if (user.calendarToken.none { it.active }) {
-                throw InvalidTokenException("Ingen gyldig token")
-            }
-            authenticationManager.authenticate(
-                    UsernamePasswordAuthenticationToken(user.email, user.pwd)
-            )
-            handleFacebookPicture(request, user)
-            val userEntity = userMapper.modelToEntity(user).apply {
-                lastLoginDate = now
-                updatedDate = now
-                imageUrl = user.imageUrl
-                imageHeight = user.imageHeight
-                imageWidth = user.imageWidth
-                imageSilhouette = user.imageSilhouette
-            }
-            userRepository.save(userEntity)
-            val calendarTokens = user.calendarToken.filter { it.active }.toSet()
-            user.calendarToken = calendarTokens
-            val jwtToken = jwtService.generateToken(user)
-            return AuthenticationResponse(jwtToken, user, null)
+        val existingUser = getExistingUser(request)
+
+        if (existingUser != null) {
+            requireActiveCalendarToken(existingUser)
+            authenticateCredentials(existingUser.email, existingUser.pwd)
+            handleFacebookPicture(request, existingUser)
+            return responseWithToken(saveFacebookLogin(existingUser, now))
         }
-        val allUsers = userRepository.findAll()
-        val firstUser = allUsers.isEmpty()
-        val roleName = if (firstUser) RoleNameEntity.ROLE_MASTER else RoleNameEntity.ROLE_USER
-        val role = roleRepository.findRoleEntityByName(roleName)
-                ?: throw NotFoundException("Role $roleName not found")
-        user = User(
-                null, request.firstName, request.middleName,
-                request.lastName, request.email, "", null, roleMapper.entityToModel(role),
-                false,
-                mutableSetOf(), mutableSetOf(), null, now, request.id, null, null, null, false
+
+        val role = requireRole(if (isFirstUser()) RoleNameEntity.ROLE_MASTER else RoleNameEntity.ROLE_USER)
+        val user = User(
+            null, request.firstName, request.middleName,
+            request.lastName, request.email, "", null, roleMapper.entityToModel(role),
+            false,
+            mutableSetOf(), mutableSetOf(), null, now, request.id, null, null, null, false
         )
         handleFacebookPicture(request, user)
-        return setDefaultValues(user)
+        return completeExternalRegistration(user)
     }
 
     override fun googleAuthenticate(request: GoogleAuthenticationRequest): AuthenticationResponse {
-        val userEntity = userRepository.findByEmailIgnoreCase(request.email)
         val now = ZonedDateTime.now()
+        val userEntity = userRepository.findByEmailIgnoreCase(request.email)
+
         if (userEntity != null) {
-            if (userEntity.calendarToken.none { it.active }) {
-                throw InvalidTokenException("Ingen gyldig token")
-            }
-            authenticationManager.authenticate(
-                    UsernamePasswordAuthenticationToken(userEntity.email, userEntity.password)
-            )
+            requireActiveCalendarToken(userEntity)
+            authenticateCredentials(userEntity.email, userEntity.password)
             userEntity.lastLoginDate = now
             userEntity.updatedDate = now
-            userRepository.save(userEntity)
-            val calendarTokens = userEntity.calendarToken.filter { it.active }.toMutableSet()
-            userEntity.calendarToken = calendarTokens
-            val user = userMapper.entityToModel(userEntity)
-            val jwtToken = jwtService.generateToken(user)
-            return AuthenticationResponse(jwtToken, user, null)
+            return responseWithToken(toUserWithActiveTokens(userRepository.save(userEntity)))
         }
-        val allUsers = userRepository.findAll()
-        val firstUser = allUsers.isEmpty()
-        val role = roleRepository.findRoleEntityByName(
-                if (firstUser) RoleNameEntity.ROLE_MASTER else RoleNameEntity.ROLE_USER
-        )
-        val user = User(
-                null, request.givenName, null, request.familyName,
-                request.email, "", null, roleMapper.entityToModel(role!!), false, mutableSetOf(), mutableSetOf(),
-                null, now, null, null, null, null, false
-        )
-        val picture = request.picture
 
-        if (picture != null) {
-            user.imageUrl = picture
-        }
-        return setDefaultValues(user)
+        val role = requireRole(if (isFirstUser()) RoleNameEntity.ROLE_MASTER else RoleNameEntity.ROLE_USER)
+        val user = User(
+            null, request.givenName, null, request.familyName,
+            request.email, "", null, roleMapper.entityToModel(role), false, mutableSetOf(), mutableSetOf(),
+            null, now, null, null, null, null, false
+        )
+        user.imageUrl = request.picture
+        return completeExternalRegistration(user)
     }
 
     override fun refresh(request: HttpServletRequest): AuthenticationResponse {
-        val authHeader = request.getHeader(HttpHeaders.AUTHORIZATION)
-        val userEmail: String?
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return AuthenticationResponse(null, null, "Invalid token")
-        }
-        val token: String = authHeader.substring(7)
-        userEmail = jwtService.extractUsername(token)
-        if (userEmail != null) {
-            val userEntity = userRepository.findByEmailIgnoreCase(userEmail)
-            if (userEntity != null) {
-                if (userEntity.calendarToken.none { it.active }) {
-                    throw InvalidTokenException("Ingen gyldig token")
-                }
-                val user = userMapper.entityToModel(userEntity)
-                user.calendarToken = user.calendarToken.filter { it.active }.toSet()
-                if (jwtService.isTokenValid(token, user)) {
-                    val accessToken = jwtService.generateToken(user)
-                    return AuthenticationResponse(accessToken, user, null)
-                }
-            }
+        val token = extractBearerToken(request) ?: return emptyAuthenticationResponse()
+        val userEmail = jwtService.extractUsername(token) ?: throw BadCredentialsException(INVALID_TOKEN_MESSAGE)
+        val userEntity = userRepository.findByEmailIgnoreCase(userEmail) ?: return emptyAuthenticationResponse()
+
+        requireActiveCalendarToken(userEntity)
+        val user = toUserWithActiveTokens(userEntity)
+        return if (jwtService.isTokenValid(token, user)) {
+            responseWithToken(user)
         } else {
-            throw BadCredentialsException("Invalid Token received!")
+            emptyAuthenticationResponse()
         }
-        return AuthenticationResponse(null, null, null)
     }
 
     override fun addtoken(request: AddTokenRequest) {
-        val userEntity = userRepository.findByEmailIgnoreCase(request.email)
-                ?: throw UsernameNotFoundException("User not found")
-        val token = calendarTokenRepository.findCalendarTokenByToken(request.token)
-        userEntity.calendarToken.add(token!!)
+        val userEntity = findUserByEmail(request.email)
+        val token = calendarTokenRepository.findCalendarTokenByToken(request.token)!!
+        userEntity.calendarToken.add(token)
         userRepository.save(userEntity)
     }
 
-    private fun setDefaultValues(user: User): AuthenticationResponse {
+    private fun createRegisteredUser(
+        request: RegisterRequest,
+        calendarToken: CalendarTokenEntity,
+        isFirstUser: Boolean,
+        now: ZonedDateTime
+    ): UserEntity {
+        val role = requireRole(if (isFirstUser) RoleNameEntity.ROLE_MASTER else RoleNameEntity.ROLE_USER)
+        return userRepository.save(
+            UserEntity(
+                id = null,
+                firstName = request.firstName,
+                middleName = request.middleName,
+                lastName = request.lastName,
+                email = request.email,
+                password = passwordEncoder.encode(request.password)!!,
+                area = request.area,
+                role = role,
+                locked = false,
+                beers = mutableSetOf(),
+                devices = mutableSetOf(),
+                calendarToken = mutableSetOf(calendarToken),
+                reviews = mutableSetOf(),
+                lastLoginDate = null,
+                createdDate = now,
+                updatedDate = now,
+                facebookUserId = null,
+                imageUrl = null,
+                imageHeight = null,
+                imageWidth = null,
+                imageSilhouette = false
+            )
+        )
+    }
+
+    private fun addCalendarTokenToExistingUser(userEntity: UserEntity, calendarToken: CalendarTokenEntity): UserEntity {
+        if (userEntity.calendarToken.none { it.id == calendarToken.id }) {
+            userEntity.calendarToken.add(calendarToken)
+            return userRepository.save(userEntity)
+        }
+        throw UserExistException("Brukeren finnes allerede")
+    }
+
+    private fun sendWelcomeEmail(user: User, now: ZonedDateTime) {
+        val mailContent = asString(welcomeEmail)
+            .replace($$"${base_url}", mailProperties.baseUrl!!)
+            .replace($$"${support_email}", mailProperties.supportEmail!!)
+            .replace($$"${calendar_token_name}", user.calendarToken.first().name)
+            .replace($$"${year}", now.year.toString())
+
+        emailService.sendSimpleMessage(
+            mailProperties.from!!,
+            user.email,
+            "Velkommen til Juleølkalender!",
+            mailContent
+        )
+    }
+
+    private fun responseWithToken(user: User): AuthenticationResponse {
+        return AuthenticationResponse(jwtService.generateToken(user), user, null)
+    }
+
+    private fun emptyAuthenticationResponse(): AuthenticationResponse {
+        return AuthenticationResponse(null, null, null)
+    }
+
+    private fun authenticateCredentials(email: String, password: String) {
+        authenticationManager.authenticate(UsernamePasswordAuthenticationToken(email, password))
+    }
+
+    private fun findUserByEmail(email: String): UserEntity {
+        return userRepository.findByEmailIgnoreCase(email)
+            ?: throw UsernameNotFoundException("User not found")
+    }
+
+    private fun requireCalendarToken(token: String): CalendarTokenEntity {
+        return calendarTokenRepository.findCalendarTokenByToken(token)
+            ?: throw InvalidTokenException("Ugyldig token")
+    }
+
+    private fun requireRole(roleName: RoleNameEntity) = roleRepository.findRoleEntityByName(roleName)
+        ?: throw NotFoundException("Role $roleName not found")
+
+    private fun isFirstUser(): Boolean = userRepository.findAll().isEmpty()
+
+    private fun requireActiveCalendarToken(userEntity: UserEntity) {
+        if (userEntity.calendarToken.none { it.active }) {
+            throw InvalidTokenException(NO_ACTIVE_TOKEN_MESSAGE)
+        }
+    }
+
+    private fun requireActiveCalendarToken(user: User) {
+        if (user.calendarToken.none { it.active }) {
+            throw InvalidTokenException(NO_ACTIVE_TOKEN_MESSAGE)
+        }
+    }
+
+    private fun toUserWithActiveTokens(userEntity: UserEntity): User {
+        val user = userMapper.entityToModel(userEntity)
+        user.calendarToken = user.calendarToken.filter(CalendarToken::active).toSet()
+        return user
+    }
+
+    private fun saveFacebookLogin(user: User, now: ZonedDateTime): User {
+        val savedUser = userRepository.save(userMapper.modelToEntity(user).apply {
+            lastLoginDate = now
+            updatedDate = now
+            imageUrl = user.imageUrl
+            imageHeight = user.imageHeight
+            imageWidth = user.imageWidth
+            imageSilhouette = user.imageSilhouette
+        })
+        return toUserWithActiveTokens(savedUser)
+    }
+
+    private fun completeExternalRegistration(user: User): AuthenticationResponse {
         val now = ZonedDateTime.now()
-        val newUser = userService.create(user.copy(
+        val newUser = userService.create(
+            user.copy(
                 calendarToken = mutableSetOf(),
                 pwd = RandomStringUtils.secureStrong().next(12),
                 locked = false,
                 lastLoginDate = now,
                 createdDate = now,
-        ))
-        return AuthenticationResponse(null, newUser, null)
+            )
+        )
+        return responseWithToken(newUser)
+    }
+
+    private fun extractBearerToken(request: HttpServletRequest): String? {
+        val authHeader = request.getHeader(HttpHeaders.AUTHORIZATION) ?: return null
+        if (!authHeader.startsWith("Bearer ")) {
+            return null
+        }
+        return authHeader.substring(7)
     }
 
     private fun getExistingUser(request: FacebookAuthenticationRequest): User? {
-        val facebookId = request.id
-        val email = request.email
-        var optionalUser = userRepository.findByFacebookUserId(facebookId)
-        if (optionalUser != null) {
-            return updateUser(request, optionalUser)
-        } else {
-            optionalUser = userRepository.findByEmailIgnoreCase(email)
-            if (optionalUser != null) {
-                return updateUser(request, optionalUser)
-            }
-        }
+        userRepository.findByFacebookUserId(request.id)?.let { return updateUser(request, it) }
+        userRepository.findByEmailIgnoreCase(request.email)?.let { return updateUser(request, it) }
         return null
     }
 
@@ -290,36 +302,35 @@ class AuthenticationServiceImpl(
     }
 
     private fun handleFacebookPicture(request: FacebookAuthenticationRequest, user: User) {
-        val data = request.picture?.data
+        val data = request.picture?.data ?: return
+        val currentImageUrl = user.imageUrl
 
-        if (data != null) {
-            val imageUrl = user.imageUrl
-            try {
-                HttpClientBuilder.create().build().use { client ->
-                    val httpGet = HttpGet(data.url)
-                    client.execute(httpGet) { response ->
-                        if (response.code != HttpStatus.SC_NOT_FOUND) {
-                            user.imageUrl = data.url
-                            user.imageHeight = data.height
-                            user.imageWidth = data.width
-                            user.imageSilhouette = data.isSilhouette
-                        } else if (imageUrl == null || "fbsbx" in imageUrl) {
-                            user.imageUrl = null
-                            user.imageHeight = null
-                            user.imageWidth = null
-                            user.imageSilhouette = false
-                        }
-                        response
+        try {
+            HttpClientBuilder.create().build().use { client ->
+                val httpGet = HttpGet(data.url)
+                client.execute(httpGet) { response ->
+                    if (response.code != HttpStatus.SC_NOT_FOUND) {
+                        user.imageUrl = data.url
+                        user.imageHeight = data.height
+                        user.imageWidth = data.width
+                        user.imageSilhouette = data.isSilhouette
+                    } else if (currentImageUrl == null || "fbsbx" in currentImageUrl) {
+                        user.imageUrl = null
+                        user.imageHeight = null
+                        user.imageWidth = null
+                        user.imageSilhouette = false
                     }
+                    response
                 }
-            } catch (e: IOException) {
-                log.error("Error getting facebook image", e)
             }
+        } catch (e: IOException) {
+            log.error("Error getting facebook image", e)
         }
     }
 
     companion object {
+        private const val INVALID_TOKEN_MESSAGE = "Invalid Token received!"
+        private const val NO_ACTIVE_TOKEN_MESSAGE = "Ingen gyldig token"
         private val log: Logger = LoggerFactory.getLogger(AuthenticationServiceImpl::class.java)
-
     }
 }

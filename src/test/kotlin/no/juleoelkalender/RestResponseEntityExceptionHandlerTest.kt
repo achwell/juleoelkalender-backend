@@ -36,135 +36,135 @@ internal class RestResponseEntityExceptionHandlerTest {
     @Test
     fun testHandleBadRequestConstraintViolationException() {
         val responseEntity = testSubject.handleBadRequest(
-                ConstraintViolationException(mutableSetOf<ConstraintViolation<*>?>()), webRequest
+            ConstraintViolationException(mutableSetOf<ConstraintViolation<*>?>()), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(400), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(400), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleBadRequestDataIntegrityViolationException() {
         val responseEntity = testSubject.handleBadRequest(
-                DataIntegrityViolationException(""), webRequest
+            DataIntegrityViolationException(""), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(400), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(400), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleHttpMessageNotReadable() {
         val responseEntity = testSubject.handleHttpMessageNotReadable(
-                HttpMessageNotReadableException("", MockClientHttpResponse("".toByteArray(), 400)),
-                HttpHeaders(), HttpStatusCode.valueOf(400), webRequest
+            HttpMessageNotReadableException("", MockClientHttpResponse("".toByteArray(), 400)),
+            HttpHeaders(), HttpStatusCode.valueOf(400), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(400), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(400), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleMethodArgumentNotValid() {
         val responseEntity = testSubject.handleMethodArgumentNotValid(
-                methodArgumentNotValidException, HttpHeaders(), HttpStatusCode.valueOf(400),
-                webRequest
+            methodArgumentNotValidException, HttpHeaders(), HttpStatusCode.valueOf(400),
+            webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(400), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(400), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleUserExistException() {
         val responseEntity = testSubject.handleUserExistException(
-                UserExistException("User exist"), webRequest
+            UserExistException("User exist"), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(401), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(401), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleUnauthorized() {
         val responseEntity = testSubject.handleUnauthorized(
-                BadCredentialsException(""), webRequest
+            BadCredentialsException(""), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(401), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(401), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleInvalidTokenException() {
         val responseEntity = testSubject.handleInvalidTokenException(
-                InvalidTokenException(""), webRequest
+            InvalidTokenException(""), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(401), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(401), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleForbidden() {
         val responseEntity = testSubject.handleForbidden(
-                AccountExpiredException(""), webRequest
+            AccountExpiredException(""), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(403), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(403), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleEntityNotFoundException() {
         val responseEntity = testSubject.handleEntityNotFoundException(
-                EntityNotFoundException(""), webRequest
+            EntityNotFoundException(""), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(404), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(404), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleNotFound() {
         val responseEntity = testSubject.handleNotFound(
-                NotFoundException(""),
-                webRequest
+            NotFoundException(""),
+            webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(404), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(404), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleConflict() {
         val responseEntity = testSubject.handleConflict(
-                InvalidDataAccessApiUsageException(""), webRequest
+            InvalidDataAccessApiUsageException(""), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(409), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(409), responseEntity?.statusCode) }
         )
     }
 
     @Test
     fun testHandleInternal() {
         val responseEntity = testSubject.handleInternal(
-                IllegalArgumentException(""), webRequest
+            IllegalArgumentException(""), webRequest
         )
         assertAll(
-                { assertNotNull(responseEntity) },
-                { assertEquals(HttpStatusCode.valueOf(500), responseEntity?.statusCode) }
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(500), responseEntity?.statusCode) }
         )
     }
 }

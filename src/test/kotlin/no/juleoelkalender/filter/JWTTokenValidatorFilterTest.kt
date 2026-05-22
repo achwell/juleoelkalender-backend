@@ -32,11 +32,11 @@ internal class JWTTokenValidatorFilterTest {
     fun setUp() {
         userEntity = getUserEntity()
         token = buildToken(
-                extraClaims = HashMap<String, Any>(),
-                username = "a@b.c",
-                authorities = listOf(SimpleGrantedAuthority("A"), SimpleGrantedAuthority("B")),
-                jwtKey = jwtKey,
-                jwtExpiresTimeoutMs = Long.MAX_VALUE
+            extraClaims = HashMap<String, Any>(),
+            username = "a@b.c",
+            authorities = listOf(SimpleGrantedAuthority("A"), SimpleGrantedAuthority("B")),
+            jwtKey = jwtKey,
+            jwtExpiresTimeoutMs = Long.MAX_VALUE
         )
         testSubject = JWTTokenValidatorFilter(jwtKey, userRepository)
     }

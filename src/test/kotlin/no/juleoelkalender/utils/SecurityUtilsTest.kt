@@ -20,52 +20,52 @@ internal class SecurityUtilsTest {
     fun testGetSignInKey() {
         val signInKey = getSignInKey(secretKey)
         assertAll(
-                { assertNotNull(signInKey) },
-                { assertEquals("HmacSHA384", signInKey.algorithm) }
+            { assertNotNull(signInKey) },
+            { assertEquals("HmacSHA384", signInKey.algorithm) }
         )
     }
 
     @Test
     fun testExtractAllClaims() {
         val token = buildToken(
-                mutableMapOf<String, Any>(), userEntity.email,
-                listOf(SimpleGrantedAuthority("ROLE_USER")), secretKey, JWT_EXPIRES_TIMEOUT_MS
+            mutableMapOf<String, Any>(), userEntity.email,
+            listOf(SimpleGrantedAuthority("ROLE_USER")), secretKey, JWT_EXPIRES_TIMEOUT_MS
         )
         val claims = extractAllClaims(token, secretKey)
         assertAll(
-                { assertNotNull(claims) },
-                { assertEquals(userEntity.email, claims.subject) }
+            { assertNotNull(claims) },
+            { assertEquals(userEntity.email, claims.subject) }
         )
     }
 
     @Test
     fun testExtractClaim() {
         val token = buildToken(
-                extraClaims = mutableMapOf<String, Any>(),
-                username = authorityEntityUser.name,
-                authorities = listOf(SimpleGrantedAuthority("ROLE_USER")),
-                jwtKey = secretKey,
-                jwtExpiresTimeoutMs = JWT_EXPIRES_TIMEOUT_MS
+            extraClaims = mutableMapOf<String, Any>(),
+            username = authorityEntityUser.name,
+            authorities = listOf(SimpleGrantedAuthority("ROLE_USER")),
+            jwtKey = secretKey,
+            jwtExpiresTimeoutMs = JWT_EXPIRES_TIMEOUT_MS
         )
 
         val subject: String = extractClaim(token, secretKey) { it.subject }
         val authorities: String = extractClaim(token, secretKey) { it.get("authorities", String::class.java) }
         assertAll(
-                { assertNotNull(subject) },
-                { assertNotNull(authorities) },
-                { assertEquals(userEntity.email, subject) },
-                { assertEquals(authorityEntityUser.name, authorities) }
+            { assertNotNull(subject) },
+            { assertNotNull(authorities) },
+            { assertEquals(userEntity.email, subject) },
+            { assertEquals(authorityEntityUser.name, authorities) }
         )
     }
 
     @Test
     fun testIsTokenExpired() {
         val token = buildToken(
-                extraClaims = mutableMapOf<String, Any>(),
-                username = authorityEntityUser.name,
-                authorities = listOf(SimpleGrantedAuthority("ROLE_USER")),
-                jwtKey = secretKey,
-                jwtExpiresTimeoutMs = JWT_EXPIRES_TIMEOUT_MS
+            extraClaims = mutableMapOf<String, Any>(),
+            username = authorityEntityUser.name,
+            authorities = listOf(SimpleGrantedAuthority("ROLE_USER")),
+            jwtKey = secretKey,
+            jwtExpiresTimeoutMs = JWT_EXPIRES_TIMEOUT_MS
         )
         assertFalse(isTokenExpired(token, secretKey))
     }
@@ -73,11 +73,11 @@ internal class SecurityUtilsTest {
     @Test
     fun testBuildToken() {
         val token = buildToken(
-                extraClaims = mutableMapOf<String, Any>(),
-                username = authorityEntityUser.name,
-                authorities = listOf(SimpleGrantedAuthority("ROLE_USER")),
-                jwtKey = secretKey,
-                jwtExpiresTimeoutMs = JWT_EXPIRES_TIMEOUT_MS
+            extraClaims = mutableMapOf<String, Any>(),
+            username = authorityEntityUser.name,
+            authorities = listOf(SimpleGrantedAuthority("ROLE_USER")),
+            jwtKey = secretKey,
+            jwtExpiresTimeoutMs = JWT_EXPIRES_TIMEOUT_MS
         )
         assertNotNull(token)
     }

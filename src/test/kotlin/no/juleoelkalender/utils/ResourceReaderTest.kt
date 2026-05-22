@@ -4,7 +4,9 @@ import io.mockk.every
 import io.mockk.mockk
 import no.juleoelkalender.utils.ResourceReader.asString
 import org.apache.commons.io.input.NullInputStream
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.core.io.InputStreamResource
@@ -28,8 +30,8 @@ internal class ResourceReaderTest {
         every { resource.inputStream } throws IOException("")
         val thrown = assertThrows<UncheckedIOException> { asString(resource) }
         assertAll(
-                { assertNotNull(thrown) },
-                { assertEquals("java.io.IOException: ", thrown.message) }
+            { assertNotNull(thrown) },
+            { assertEquals("java.io.IOException: ", thrown.message) }
         )
     }
 }

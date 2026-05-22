@@ -3,7 +3,9 @@ package no.juleoelkalender.mappers
 import no.juleoelkalender.entity.BeerStyleEntity
 import no.juleoelkalender.getBeerStyle
 import no.juleoelkalender.getBeerStyleEntity
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -21,9 +23,9 @@ internal class BeerStyleMapperTest {
     fun testEntityToModel() {
         val beerStyle = testSubject.entityToModel(beerStyleEntity)
         assertAll(
-                { assertNotNull(beerStyle) },
-                { assertEquals(beerStyleEntity.id, beerStyle.id) },
-                { assertEquals(beerStyleEntity.name, beerStyle.name) }
+            { assertNotNull(beerStyle) },
+            { assertEquals(beerStyleEntity.id, beerStyle.id) },
+            { assertEquals(beerStyleEntity.name, beerStyle.name) }
         )
     }
 
@@ -31,9 +33,9 @@ internal class BeerStyleMapperTest {
     fun testModelToEntity() {
         val beerCalendarEntity = testSubject.modelToEntity(getBeerStyle())
         assertAll(
-                { assertNotNull(beerCalendarEntity) },
-                { assertEquals(getBeerStyle().id, beerCalendarEntity.id) },
-                { assertEquals(getBeerStyle().name, beerCalendarEntity.name) }
+            { assertNotNull(beerCalendarEntity) },
+            { assertEquals(getBeerStyle().id, beerCalendarEntity.id) },
+            { assertEquals(getBeerStyle().name, beerCalendarEntity.name) }
         )
     }
 }

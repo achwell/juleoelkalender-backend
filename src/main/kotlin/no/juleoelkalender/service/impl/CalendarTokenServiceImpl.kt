@@ -11,11 +11,11 @@ import java.util.function.Consumer
 
 @Service
 class CalendarTokenServiceImpl(private val calendarTokenRepository: CalendarTokenRepository, mapper: CalendarTokenMapper) : BaseServiceImpl<UUID, CalendarToken, CalendarTokenEntity>(
-        calendarTokenRepository, mapper
+    calendarTokenRepository, mapper
 ), CalendarTokenService {
     override fun mapModelToEntity(
-            model: CalendarToken,
-            entity: CalendarTokenEntity
+        model: CalendarToken,
+        entity: CalendarTokenEntity
     ) {
         entity.token = model.token
         entity.name = model.name

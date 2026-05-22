@@ -9,7 +9,12 @@ import no.juleoelkalender.entity.UserEntity
 import no.juleoelkalender.getRoleEntityUser
 import no.juleoelkalender.getUser
 import no.juleoelkalender.getUserEntity
-import no.juleoelkalender.mappers.*
+import no.juleoelkalender.mappers.AuthorityMapper
+import no.juleoelkalender.mappers.BeerMapper
+import no.juleoelkalender.mappers.CalendarTokenMapper
+import no.juleoelkalender.mappers.RoleMapper
+import no.juleoelkalender.mappers.UserMapper
+import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.User
 import no.juleoelkalender.repository.CalendarTokenRepository
 import no.juleoelkalender.repository.DeviceRepository
@@ -57,8 +62,8 @@ internal class UserServiceTest {
 
         val users = testSubject.all
         Assertions.assertAll(
-                { Assertions.assertNotNull(users) },
-                { Assertions.assertEquals(3, users.size) }
+            { Assertions.assertNotNull(users) },
+            { Assertions.assertEquals(3, users.size) }
         )
     }
 
@@ -67,8 +72,8 @@ internal class UserServiceTest {
         every { userRepository.findById(any()) } returns Optional.of(userEntity)
         val user = testSubject.getById(userEntity.id!!)
         Assertions.assertAll(
-                { Assertions.assertNotNull(user) },
-                { Assertions.assertEquals(userEntity.id, user?.id) }
+            { Assertions.assertNotNull(user) },
+            { Assertions.assertEquals(userEntity.id, user?.id) }
         )
     }
 
@@ -77,8 +82,8 @@ internal class UserServiceTest {
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
         val user = testSubject.loadUserByUsername(userEntity.email.uppercase(Locale.getDefault()))
         Assertions.assertAll(
-                { Assertions.assertNotNull(user) },
-                { Assertions.assertEquals(userEntity.email, user.username) }
+            { Assertions.assertNotNull(user) },
+            { Assertions.assertEquals(userEntity.email, user.username) }
         )
     }
 
@@ -95,9 +100,9 @@ internal class UserServiceTest {
         every { userRepository.save(any()) } returns userEntity
         val user = testSubject.create(userMapper.entityToModel(userEntity))
         Assertions.assertAll(
-                { Assertions.assertNotNull(user) },
-                { Assertions.assertEquals(userEntity.email, user.email) },
-                { Assertions.assertNotNull(user.pwd) }
+            { Assertions.assertNotNull(user) },
+            { Assertions.assertEquals(userEntity.email, user.email) },
+            { Assertions.assertNotNull(user.pwd) }
         )
     }
 
@@ -124,9 +129,9 @@ internal class UserServiceTest {
         every { userRepository.save(any()) } returns userEntity
         val user = testSubject.updatePassword(userEntity.email, userEntity.password)
         Assertions.assertAll(
-                { Assertions.assertNotNull(user) },
-                { Assertions.assertEquals(userEntity.email, user.email) },
-                { Assertions.assertNotNull(user.pwd) }
+            { Assertions.assertNotNull(user) },
+            { Assertions.assertEquals(userEntity.email, user.email) },
+            { Assertions.assertNotNull(user.pwd) }
         )
     }
 

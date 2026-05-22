@@ -27,26 +27,31 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     // API
     // 400
     @ExceptionHandler(ConstraintViolationException::class)
-    fun handleBadRequest(ex: ConstraintViolationException, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, "Ikke sammenheng mellom inputdata", HttpHeaders(), HttpStatus.BAD_REQUEST, request)
+    fun handleBadRequest(ex: ConstraintViolationException, request: WebRequest): ResponseEntity<in Any>? =
+        handleExceptionInternal(ex, "Ikke sammenheng mellom inputdata", HttpHeaders(), HttpStatus.BAD_REQUEST, request)
 
     @ExceptionHandler(DataIntegrityViolationException::class)
-    fun handleBadRequest(ex: DataIntegrityViolationException, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, "Kan ikke tolke inputdata", HttpHeaders(), HttpStatus.BAD_REQUEST, request)
+    fun handleBadRequest(ex: DataIntegrityViolationException, request: WebRequest): ResponseEntity<in Any>? =
+        handleExceptionInternal(ex, "Kan ikke tolke inputdata", HttpHeaders(), HttpStatus.BAD_REQUEST, request)
 
     public override fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException, headers: HttpHeaders, status: HttpStatusCode, request: WebRequest): ResponseEntity<in Any>? =
-            // ex.getCause() instanceof JsonMappingException, JsonParseException // for additional information later on
-            handleExceptionInternal(ex, "Kan ikke lese innputdata", headers, HttpStatus.BAD_REQUEST, request)
+        // ex.getCause() instanceof JsonMappingException, JsonParseException // for additional information later on
+        handleExceptionInternal(ex, "Kan ikke lese innputdata", headers, HttpStatus.BAD_REQUEST, request)
 
-    public override fun handleMethodArgumentNotValid(ex: MethodArgumentNotValidException, headers: HttpHeaders, status: HttpStatusCode, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, "Ikke tillatt metode", headers, HttpStatus.BAD_REQUEST, request)
+    public override fun handleMethodArgumentNotValid(ex: MethodArgumentNotValidException, headers: HttpHeaders, status: HttpStatusCode, request: WebRequest): ResponseEntity<in Any>? =
+        handleExceptionInternal(ex, "Ikke tillatt metode", headers, HttpStatus.BAD_REQUEST, request)
 
     // 401
     @ExceptionHandler(value = [UserExistException::class])
     fun handleUserExistException(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, ex.localizedMessage, HttpHeaders(), HttpStatus.UNAUTHORIZED, request)
 
     @ExceptionHandler(value = [BadCredentialsException::class])
-    fun handleUnauthorized(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, "Feil epost eller passord", HttpHeaders(), HttpStatus.UNAUTHORIZED, request)
+    fun handleUnauthorized(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? =
+        handleExceptionInternal(ex, "Feil epost eller passord", HttpHeaders(), HttpStatus.UNAUTHORIZED, request)
 
     @ExceptionHandler(value = [InvalidTokenException::class])
-    fun handleInvalidTokenException(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, ex.localizedMessage, HttpHeaders(), HttpStatus.UNAUTHORIZED, request)
+    fun handleInvalidTokenException(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? =
+        handleExceptionInternal(ex, ex.localizedMessage, HttpHeaders(), HttpStatus.UNAUTHORIZED, request)
 
     // 403
     @ExceptionHandler(value = [AuthenticationException::class])
@@ -54,14 +59,16 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
 
     // 404
     @ExceptionHandler(value = [EntityNotFoundException::class])
-    fun handleEntityNotFoundException(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, "Fant ikke det du ba om", HttpHeaders(), HttpStatus.NOT_FOUND, request)
+    fun handleEntityNotFoundException(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? =
+        handleExceptionInternal(ex, "Fant ikke det du ba om", HttpHeaders(), HttpStatus.NOT_FOUND, request)
 
     @ExceptionHandler(value = [NotFoundException::class])
     fun handleNotFound(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, "Fant ikke det du ba om", HttpHeaders(), HttpStatus.NOT_FOUND, request)
 
     // 409
     @ExceptionHandler(InvalidDataAccessApiUsageException::class, DataAccessException::class)
-    fun handleConflict(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? = handleExceptionInternal(ex, "Problemer med tilgang til ressurs", HttpHeaders(), HttpStatus.CONFLICT, request)
+    fun handleConflict(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? =
+        handleExceptionInternal(ex, "Problemer med tilgang til ressurs", HttpHeaders(), HttpStatus.CONFLICT, request)
 
     // 412
     // 500

@@ -34,8 +34,8 @@ internal class BeerStyleServiceTest {
         every { beerStyleRepository.findAll() } returns listOf(beerStyleEntity)
         val beerStyles = testSubject.all
         Assertions.assertAll(
-                { Assertions.assertNotNull(beerStyles) },
-                { Assertions.assertEquals(1, beerStyles.size) }
+            { Assertions.assertNotNull(beerStyles) },
+            { Assertions.assertEquals(1, beerStyles.size) }
         )
     }
 
@@ -44,8 +44,8 @@ internal class BeerStyleServiceTest {
         every { beerStyleRepository.findById(any()) } returns Optional.of(beerStyleEntity)
         val beerStyle = testSubject.getById(beerStyleEntity.id!!)
         Assertions.assertAll(
-                { Assertions.assertNotNull(beerStyle) },
-                { Assertions.assertEquals(beerStyleEntity.id, beerStyle!!.id) }
+            { Assertions.assertNotNull(beerStyle) },
+            { Assertions.assertEquals(beerStyleEntity.id, beerStyle!!.id) }
         )
     }
 
@@ -54,8 +54,8 @@ internal class BeerStyleServiceTest {
         every { beerStyleRepository.save(any()) } returns beerStyleEntity
         val beerStyle = testSubject.create(this.beerStyle)
         Assertions.assertAll(
-                { Assertions.assertNotNull(beerStyle) },
-                { Assertions.assertEquals(beerStyleEntity.id, beerStyle.id) }
+            { Assertions.assertNotNull(beerStyle) },
+            { Assertions.assertEquals(beerStyleEntity.id, beerStyle.id) }
         )
     }
 
@@ -65,8 +65,8 @@ internal class BeerStyleServiceTest {
         every { beerStyleRepository.save(any()) } returns beerStyleEntity
         val result = testSubject.update(beerStyle.id!!, beerStyle)
         Assertions.assertAll(
-                { Assertions.assertNotNull(result) },
-                { Assertions.assertEquals(beerStyle.id, result!!.id) }
+            { Assertions.assertNotNull(result) },
+            { Assertions.assertEquals(beerStyle.id, result!!.id) }
         )
     }
 
