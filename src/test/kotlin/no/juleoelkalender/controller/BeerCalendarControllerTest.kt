@@ -67,7 +67,7 @@ internal class BeerCalendarControllerTest {
         ) { testSubject.getBeerCalendarById(beerCalendar.id) }
         assertAll(
             { assertNotNull(thrown) },
-            { assertNull(thrown.message) }
+            { assertEquals("BeerCalendar with id ${beerCalendar.id} not found", thrown.message) }
         )
     }
 

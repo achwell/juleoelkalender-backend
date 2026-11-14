@@ -29,6 +29,7 @@ import no.juleoelkalender.repository.CalendarRepository
 import no.juleoelkalender.repository.UserRepository
 import no.juleoelkalender.service.impl.BeerServiceImpl
 import no.juleoelkalender.utils.ExcelGenerator
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -63,6 +64,11 @@ internal class BeerServiceTest {
     private lateinit var calendarEntity: CalendarEntity
     private lateinit var userEntity: UserEntity
 
+    @AfterEach
+    fun clearSecurityContext() {
+        SecurityContextHolder.clearContext()
+    }
+
     @BeforeEach
     fun setUp() {
         beer = getBeer()
@@ -86,7 +92,7 @@ internal class BeerServiceTest {
 
     @Test
     fun testGetBeers() {
-        every { beerRepository.findAll() } returns listOf(beerEntity, beerEntity, beerEntity)
+        every { beerRepository.findAll() } returns listOf(beerEntity, getBeerEntity().apply { id = UUID.randomUUID() }, getBeerEntity().apply { id = UUID.randomUUID() })
         val beers = testSubject.all
         Assertions.assertAll(
             { Assertions.assertNotNull(beers) },
@@ -209,6 +215,11 @@ internal class BeerServiceTest {
 
     @Test
     fun testDeleteBeerExist() {
+        every { beerRepository.findById(any()) } returns Optional.of(beerEntity)
+        SecurityContextHolder.getContext().authentication =
+            org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                beerEntity.user.email, null, listOf(org.springframework.security.core.authority.SimpleGrantedAuthority("beer:delete"))
+            )
         every { beerRepository.existsById(any()) } returns true
         every { beerRepository.deleteById(any()) } just Runs
         val deleted = testSubject.delete(beerEntity.id)
@@ -269,6 +280,53 @@ internal class BeerServiceTest {
             { Assertions.assertNotNull(beers.first().calendar) },
             { Assertions.assertNotNull(beers.first().brewer) }
         )
+    }
+
+    @Test
+    fun todaysBeerMatchesEqualUuidAndAllowsMissingReview() {
+        val reviewer = getUserEntity().apply {
+            id = UUID.fromString(userEntity.id.toString())
+        }
+        val now = ZonedDateTime.now()
+        val review = ReviewEntity(
+            UUID.randomUUID(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            "", now, now, beerEntity, calendarEntity, reviewer
+        )
+        beerEntity.reviews = mutableSetOf(review)
+        calendarEntity.year = 2023
+        calendarEntity.beerCalendars = mutableSetOf(
+            BeerCalendarEntity(UUID.randomUUID(), 1, beerEntity, calendarEntity)
+        )
+        userEntity.beers = mutableSetOf(beerEntity)
+        SecurityContextHolder.getContext().authentication =
+            org.springframework.security.authentication.UsernamePasswordAuthenticationToken(userEntity.email, null)
+        every { userRepository.findByEmailIgnoreCase(userEntity.email) } returns userEntity
+        every { calendarRepository.findByCalendarToken(any()) } returns listOf(calendarEntity)
+
+        val date = LocalDate.of(2023, Month.DECEMBER, 1)
+        Assertions.assertEquals(
+            review.id,
+            testSubject.getBeersWithCalendarAndReviewByDate(date).single().review?.id
+        )
+
+        beerEntity.reviews.clear()
+        Assertions.assertNull(testSubject.getBeersWithCalendarAndReviewByDate(date).single().review)
+    }
+
+    @Test
+    fun readingBeersPreservesInactiveCalendarTokens() {
+        val inactiveToken = no.juleoelkalender.getCalendarTokenEntity().apply {
+            id = UUID.randomUUID()
+            active = false
+        }
+        beerEntity.user.calendarToken.add(inactiveToken)
+        val originalTokens = beerEntity.user.calendarToken.toSet()
+        every { beerRepository.findAll() } returns listOf(beerEntity)
+
+        val result = testSubject.getBeersWithCalendar(null, null)
+
+        Assertions.assertEquals(originalTokens, beerEntity.user.calendarToken)
+        Assertions.assertTrue(result.all { row -> row.brewer.calendarToken.all { it.active } })
     }
 
     @Test

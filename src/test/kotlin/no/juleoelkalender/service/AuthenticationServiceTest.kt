@@ -1,6 +1,5 @@
 package no.juleoelkalender.service
 
-import io.jsonwebtoken.MalformedJwtException
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -57,10 +56,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.oauth2.jwt.BadJwtException
 import java.time.ZonedDateTime
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.test.assertTrue
 import kotlin.test.fail
 
 internal class AuthenticationServiceTest {
@@ -229,6 +228,7 @@ internal class AuthenticationServiceTest {
         )
         every { authenticationManager.authenticate(authentication) } returns authentication
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
+        every { userRepository.save(any()) } returns userEntity
         val authenticationResponse = testSubject.authenticate(request)
 
         Assertions.assertAll(
@@ -292,7 +292,7 @@ internal class AuthenticationServiceTest {
     fun testRefresh() {
         val token = buildToken(
             extraClaims = emptyMap<String, Any>(),
-            username = authorityEntityUser.name,
+            username = userEntity.email,
             authorities = listOf(SimpleGrantedAuthority(RoleNameEntity.ROLE_USER.name)),
             jwtKey = jwtKey,
             jwtExpiresTimeoutMs = jwtExpiresTimeoutMs
@@ -349,14 +349,9 @@ internal class AuthenticationServiceTest {
     @Test
     fun testRefreshIllegalToken() {
         every { request.getHeader(HttpHeaders.AUTHORIZATION) } returns "Bearer zzz.yyy.xxx"
-        every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
-        every { jwtService.extractUsername(any()) } returns userEntity.email
-        every { jwtService.isTokenValid(any(), any()) } throws MalformedJwtException("Malformed protected header JSON: Unable to deserialize: Unexpected character")
-        val thrown = assertThrows<MalformedJwtException> { testSubject.refresh(request) }
-        Assertions.assertAll(
-            { Assertions.assertNotNull(thrown) },
-            { assertTrue(thrown.message!!.startsWith("Malformed protected header JSON: Unable to deserialize: Unexpected character")) }
-        )
+        // Exercise the real decoder: JwtService is not a mock.
+        val thrown = assertThrows<BadJwtException> { testSubject.refresh(request) }
+        Assertions.assertNotNull(thrown.message)
     }
 
     @Test
@@ -373,7 +368,6 @@ internal class AuthenticationServiceTest {
         every { userService.update(any(), any()) } returns userMapper.entityToModel(userEntity)
         every { authenticationManager.authenticate(any()) } returns UsernamePasswordAuthenticationToken("", "")
         every { userRepository.save(any()) } returns userEntity
-        every { jwtService.generateToken(any()) } returns "token"
 
         val authenticationResponse: AuthenticationResponse = testSubject.facebookAuthenticate(facebookAuthenticationRequest)
         Assertions.assertAll(
@@ -399,7 +393,6 @@ internal class AuthenticationServiceTest {
         every { userService.update(any(), any()) } returns userMapper.entityToModel(userEntity)
         every { authenticationManager.authenticate(any()) } returns UsernamePasswordAuthenticationToken("", "")
         every { userRepository.save(any()) } returns userEntity
-        every { jwtService.generateToken(any()) } returns "token"
 
         val authenticationResponse: AuthenticationResponse = testSubject.facebookAuthenticate(facebookAuthenticationRequest)
         Assertions.assertAll(
@@ -426,7 +419,6 @@ internal class AuthenticationServiceTest {
         every { userRepository.findAll() } returns listOf(userEntity)
         every { roleRepository.findRoleEntityByName(any()) } returns roleEntityUser
         every { userService.create(any()) } returns userMapper.entityToModel(userEntity)
-        every { jwtService.generateToken(any()) } returns "token"
 
         val authenticationResponse = testSubject.facebookAuthenticate(facebookAuthenticationRequest)
 
@@ -443,7 +435,6 @@ internal class AuthenticationServiceTest {
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntityAdmin
         every { authenticationManager.authenticate(any()) } returns UsernamePasswordAuthenticationToken("", "")
         every { userRepository.save(any()) } returns userEntityAdmin
-        every { jwtService.generateToken(any()) } returns "token"
 
         val authenticationRequest = GoogleAuthenticationRequest("", "", "", "", null)
         val authenticationResponse = testSubject.googleAuthenticate(authenticationRequest)
@@ -462,7 +453,6 @@ internal class AuthenticationServiceTest {
         every { userRepository.findAll() } returns listOf()
         every { roleRepository.findRoleEntityByName(any()) } returns roleEntityUser
         every { userService.create(any()) } returns userMapper.entityToModel(userEntity)
-        every { jwtService.generateToken(any()) } returns "token"
 
         val authenticationRequest = GoogleAuthenticationRequest("", "", "", "", null)
         val authenticationResponse = testSubject.googleAuthenticate(authenticationRequest)

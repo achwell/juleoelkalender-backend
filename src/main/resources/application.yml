@@ -124,10 +124,25 @@ spring:
   profiles:
     active: prod
 springdoc:
-  swagger-ui:
-    path: /v3/swagger-ui.html
   api-docs:
+    enabled: true
+    version: openapi_3_1
     path: /v3/api-docs
     groups:
       enabled: true
     resolve-schema-properties: true
+  model-converters:
+    kotlin-nullable-property-customizer:
+      # Null-valued response properties are omitted; request schemas are also non-nullable.
+      enabled: false
+  swagger-ui:
+    path: /v3/swagger-ui.html
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  writer-with-default-pretty-printer: true
+  nullable-request-parameter-enabled: false
+  show-kotlin-nullable-as-required: false
+  enable-kotlin: true
+  schema:
+    default-property-initialization: false
+    default-values: false

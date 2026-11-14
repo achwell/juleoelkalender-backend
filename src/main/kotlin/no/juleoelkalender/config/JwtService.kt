@@ -1,6 +1,5 @@
 package no.juleoelkalender.config
 
-import io.jsonwebtoken.Claims
 import no.juleoelkalender.model.User
 import no.juleoelkalender.utils.buildToken
 import no.juleoelkalender.utils.extractClaim
@@ -28,7 +27,7 @@ class JwtService(@param:Value($$"${app.jwt.secret_key}") private val jwtKey: Str
     }
 
     fun extractUsername(token: String): String? {
-        return extractClaim(token, jwtKey) { obj: Claims? -> obj!!.subject }
+        return extractClaim(token, jwtKey) { it.subject }
     }
 
     fun isTokenValid(token: String, userDetails: User): Boolean {

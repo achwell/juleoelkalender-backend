@@ -38,10 +38,9 @@ class ReviewServiceImpl(
     override val reviewsWithUser: Set<ReviewWithUser>
         get() {
             val calendarTokenId = currentUsersActiveCalendarTokenId() ?: return emptySet()
-            return repository.findAll()
+            return reviewRepository.findByCalendar_CalendarToken_Id(calendarTokenId)
                 .asSequence()
                 .map(mapper::entityToModel)
-                .filter { it.calendar.calendarToken.id == calendarTokenId }
                 .groupBy { ReviewGroupKey(it.calendar.id, it.beer.id) }
                 .values
                 .map(::toReviewWithUser)
@@ -60,7 +59,6 @@ class ReviewServiceImpl(
     override fun preCreate(model: Review): ReviewEntity {
         val reviewEntity = mapper.modelToEntity(model)
         currentUser()?.let { user ->
-            user.calendarToken = user.calendarToken.filter(CalendarTokenEntity::active).toMutableSet()
             reviewEntity.user = user
         }
         return reviewEntity
@@ -87,7 +85,7 @@ class ReviewServiceImpl(
 
     override fun getReviewDataByBeerId(beerId: UUID): Set<ReviewData> {
         val beerEntity = beerRepository.findById(beerId).orElse(null) ?: return emptySet()
-        val allReviewsByCalendar = reviewRepository.findAll().map(mapper::entityToModel).groupBy { it.calendar.id }
+        val allReviewsByCalendar = reviewRepository.findByBeer_Id(beerId).map(mapper::entityToModel).groupBy { it.calendar.id }
         val beer = beerMapper.entityToModel(beerEntity)
         val calendarCache = mutableMapOf<UUID, CalendarEntity?>()
 
@@ -98,12 +96,8 @@ class ReviewServiceImpl(
             } ?: return@mapNotNull null
             val calendar = calendarMapper.entityToModel(calendarEntity)
             val reviewsByCalendar = allReviewsByCalendar[calendarId].orEmpty()
-            val average = calculateAverage(reviewsByCalendar, calendar, beer, beer.brewer).apply {
-                this.beer = beer
-                this.calendar = calendar
-            }
-            val reviews = reviewsByCalendar.filter { it.beer.id == beerEntity.id }.toSet()
-            ReviewData(reviews, calendar, average)
+            val average = calculateAverage(reviewsByCalendar, calendar, beer, beer.brewer)
+            ReviewData(reviewsByCalendar.toSet(), calendar, average)
         }.toSet()
     }
 

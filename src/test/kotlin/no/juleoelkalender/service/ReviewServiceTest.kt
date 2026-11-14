@@ -4,6 +4,7 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
 import no.juleoelkalender.entity.BeerEntity
 import no.juleoelkalender.entity.CalendarEntity
 import no.juleoelkalender.entity.ReviewEntity
@@ -12,6 +13,7 @@ import no.juleoelkalender.getBeer
 import no.juleoelkalender.getBeerEntity
 import no.juleoelkalender.getCalendar
 import no.juleoelkalender.getCalendarEntity
+import no.juleoelkalender.getCalendarTokenEntity
 import no.juleoelkalender.getReviewEntity
 import no.juleoelkalender.getUserEntity
 import no.juleoelkalender.getUserWithoutChildren
@@ -32,6 +34,7 @@ import no.juleoelkalender.repository.ReviewRepository
 import no.juleoelkalender.repository.UserRepository
 import no.juleoelkalender.service.impl.ReviewServiceImpl
 import no.juleoelkalender.utils.ExcelGenerator
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
@@ -39,6 +42,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertNotNull
 import org.springframework.security.authentication.InsufficientAuthenticationException
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContext
@@ -68,6 +72,11 @@ internal class ReviewServiceTest {
     private lateinit var reviewEntity: ReviewEntity
     private lateinit var userEntity: UserEntity
     private lateinit var userWithoutChildren: UserWithoutChildren
+
+    @AfterEach
+    fun clearSecurityContext() {
+        SecurityContextHolder.clearContext()
+    }
 
     @BeforeEach
     fun setUp() {
@@ -100,7 +109,7 @@ internal class ReviewServiceTest {
         SecurityContextHolder.setContext(securityContext)
         every { SecurityContextHolder.getContext().authentication?.principal } returns userEntity.email
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
-        every { reviewRepository.findAll() } returns listOf(reviewEntity)
+        every { reviewRepository.findByCalendar_CalendarToken_Id(userEntity.calendarToken.first { it.active }.id) } returns listOf(reviewEntity)
 
         val reviews = testSubject.reviewsWithUser
 
@@ -118,7 +127,7 @@ internal class ReviewServiceTest {
         SecurityContextHolder.setContext(securityContext)
         every { SecurityContextHolder.getContext().authentication?.principal } returns userEntity.email
         every { userRepository.findByEmailIgnoreCase(any()) } returns null
-        every { reviewRepository.findAll() } returns listOf(reviewEntity)
+        every { reviewRepository.findByCalendar_CalendarToken_Id(userEntity.calendarToken.first { it.active }.id) } returns listOf(reviewEntity)
 
         val reviews = testSubject.reviewsWithUser
         assertAll(
@@ -135,7 +144,7 @@ internal class ReviewServiceTest {
         SecurityContextHolder.setContext(securityContext)
         every { SecurityContextHolder.getContext().authentication?.principal } returns userEntity.email
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
-        every { reviewRepository.findAll() } returns listOf(reviewEntity, reviewEntity)
+        every { reviewRepository.findByCalendar_CalendarToken_Id(userEntity.calendarToken.first { it.active }.id) } returns listOf(reviewEntity, reviewEntity)
 
         val reviews = testSubject.reviewsWithUser
         assertAll(
@@ -221,8 +230,16 @@ internal class ReviewServiceTest {
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
         every { reviewRepository.save(any()) } returns reviewEntity
 
+        val inactiveToken = getCalendarTokenEntity().apply {
+            id = UUID.randomUUID()
+            active = false
+        }
+        userEntity.calendarToken.add(inactiveToken)
+        val originalTokens = userEntity.calendarToken.toSet()
+
         val review = testSubject.create(reviewMapper.entityToModel(reviewEntity))
 
+        Assertions.assertEquals(originalTokens, userEntity.calendarToken)
         assertAll(
             { assertNotNull(review) },
             { Assertions.assertEquals(reviewEntity.id, review.id) },
@@ -270,11 +287,10 @@ internal class ReviewServiceTest {
     fun testDeleteReviewExistNoAuthorities() {
         every { reviewRepository.existsById(any()) } returns true
         every { reviewRepository.findById(any()) } returns Optional.of(reviewEntity)
-        val authentication = mockk<Authentication>()
-        val securityContext = mockk<SecurityContext>()
-        every { securityContext.authentication } returns authentication
-        SecurityContextHolder.setContext(securityContext)
-        every { SecurityContextHolder.getContext().authentication?.authorities } returns listOf()
+        SecurityContextHolder.getContext().authentication =
+            UsernamePasswordAuthenticationToken(
+                "other@user.no", null, emptyList()
+            )
         val thrown = assertThrows(InsufficientAuthenticationException::class.java) {
             testSubject.delete(
                 reviewEntity.id
@@ -306,10 +322,11 @@ internal class ReviewServiceTest {
     @Test
     fun getReviewDataByBeerId() {
         every { beerRepository.findById(any()) } returns Optional.of(beerEntity)
-        every { reviewRepository.findAll() } returns listOf(reviewEntity)
+        every { reviewRepository.findByBeer_Id(beerEntity.id) } returns listOf(reviewEntity)
         every { calendarRepository.findById(any()) } returns Optional.of(calendarEntity)
 
         val reviewData = testSubject.getReviewDataByBeerId(beerEntity.id)
+        verify(exactly = 0) { reviewRepository.findAll() }
 
         assertAll(
             { assertNotNull(reviewData) },
@@ -320,6 +337,7 @@ internal class ReviewServiceTest {
             { assertNotNull(data) },
             { Assertions.assertEquals(1, data.reviews.size) },
             { assertNotNull(data.average) },
+            { Assertions.assertEquals(reviewEntity.ratingOverall, data.average.ratingOverall) },
             { assertNotNull(data.calendar) }
         )
     }
@@ -374,7 +392,7 @@ internal class ReviewServiceTest {
         SecurityContextHolder.setContext(securityContext)
         every { SecurityContextHolder.getContext().authentication?.principal } returns userEntity.email
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
-        every { reviewRepository.findAll() } returns listOf(reviewEntity)
+        every { reviewRepository.findByCalendar_CalendarToken_Id(userEntity.calendarToken.first { it.active }.id) } returns listOf(reviewEntity)
         val reviewsXlsx = testSubject.getReviewsXlsx("no")
         assertNotNull(reviewsXlsx)
     }

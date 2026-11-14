@@ -26,7 +26,7 @@ internal class EmailServiceTest {
     @Test
     fun sendSimpleMessage() {
         every { emailSender.createMimeMessage() } returns MimeMessage(Session.getInstance(Properties()))
-        every { emailSender.send(any<MimeMessage>(), any()) } just Runs
+        every { emailSender.send(any<MimeMessage>()) } just Runs
 
         try {
             testSubject.sendSimpleMessage("first@last.no", "first@last.no", "subject", "content")

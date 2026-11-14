@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 abstract class BaseServiceImpl<PK : Any, T : Any, E : Any> protected constructor(protected val repository: JpaRepository<E, PK>, protected val mapper: BaseMapper<T, E>) : BaseService<PK, T> {
 
     override val all: Set<T>
-        get() = repository.findAll().map { mapper.entityToModel(it) }.map { postGet(it) }.toSet()
+        get() = repository.findAll().mapTo(linkedSetOf()) { postGet(mapper.entityToModel(it)) }
 
     override fun getById(id: PK): T? {
         val entity = repository.findById(id)

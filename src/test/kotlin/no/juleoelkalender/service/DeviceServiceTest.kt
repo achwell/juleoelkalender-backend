@@ -65,6 +65,7 @@ internal class DeviceServiceTest {
     @Test
     fun testUpdate() {
         every { deviceRepository.findById(any()) } returns Optional.of(deviceEntity)
+        every { deviceRepository.save(any()) } returns deviceEntity
         val updated = testSubject.update(device.id, device)
         assertNotNull(updated)
     }

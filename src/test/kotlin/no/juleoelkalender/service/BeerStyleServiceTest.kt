@@ -1,6 +1,8 @@
 package no.juleoelkalender.service
 
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import no.juleoelkalender.entity.BeerStyleEntity
 import no.juleoelkalender.getBeerStyle
@@ -73,6 +75,7 @@ internal class BeerStyleServiceTest {
     @Test
     fun testDeleteBeerStyle() {
         every { beerStyleRepository.existsById(any()) } returns true
+        every { beerStyleRepository.deleteById(any()) } just Runs
         val deleted = testSubject.delete(beerStyleEntity.id!!)
         Assertions.assertTrue(deleted)
     }

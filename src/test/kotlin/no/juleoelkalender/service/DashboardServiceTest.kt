@@ -31,7 +31,7 @@ import java.time.ZonedDateTime
 internal class DashboardServiceTest {
     private lateinit var testSubject: DashboardService
 
-    private val healthIndicators = mockk<MutableSet<HealthIndicator>>()
+    private val healthIndicators = mutableSetOf<HealthIndicator>()
     private val healthEndpoint = mockk<HealthEndpoint>()
     private val beerService = mockk<BeerService>()
     private val calendarService = mockk<CalendarService>()
@@ -68,13 +68,14 @@ internal class DashboardServiceTest {
         val diskSpaceHealthIndicator = DiskSpaceHealthIndicator(File("."), DataSize.ofBytes(1))
         val indicators: MutableCollection<HealthIndicator> = mutableSetOf(diskSpaceHealthIndicator)
         every { infoEndpoint.info() } returns info
-        every { healthIndicators.filter(any()) } returns listOf(indicators.first())
+        healthIndicators.addAll(indicators)
         every { healthEndpoint.healthForPath(any()) } returns healthDescriptor
         every { healthEndpoint.health() } returns healthDescriptor
         every { healthDescriptor.status } returns Status.UP
         every { metricsEndpoint.metric(any(), any()) } returns metricDescriptor
         every { metricDescriptor.measurements } returns listOf(sample)
         every { sample.value } returns 1.0
+        every { deviceService.all } returns emptySet()
         every { userService.all } returns setOf(user)
         every { beerService.all } returns setOf(beer)
         every { beerService.getBeersWithCalendar(null, null) } returns setOf(beerWithCalendarAndDay)

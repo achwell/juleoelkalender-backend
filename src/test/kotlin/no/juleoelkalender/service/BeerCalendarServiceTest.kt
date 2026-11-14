@@ -1,6 +1,8 @@
 package no.juleoelkalender.service
 
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import no.juleoelkalender.entity.BeerCalendarEntity
 import no.juleoelkalender.entity.BeerEntity
@@ -54,7 +56,10 @@ internal class BeerCalendarServiceTest {
 
     @Test
     fun testGetBeerCalendars() {
-        every { beerCalendarRepository.findAll() } returns listOf(beerCalendarEntity, beerCalendarEntity, beerCalendarEntity)
+        every { beerCalendarRepository.findAll() } returns listOf(
+            beerCalendarEntity,
+            getBeerCalendarEntity().apply { id = UUID.randomUUID() },
+            getBeerCalendarEntity().apply { id = UUID.randomUUID() })
         val beerCalendars = testSubject.all
         Assertions.assertAll(
             { Assertions.assertNotNull(beerCalendars) },
@@ -71,7 +76,7 @@ internal class BeerCalendarServiceTest {
 
     @Test
     fun testCreateBeerCalendar() {
-        every { beerCalendarRepository.getReferenceById(any()) } returns beerCalendarEntity
+        every { beerRepository.getReferenceById(any()) } returns beerEntity
         every { calendarRepository.getReferenceById(any()) } returns calendarEntity
         every { beerCalendarRepository.save(any()) } returns beerCalendarEntity
         val newBeerCalendar = testSubject.create(
@@ -109,6 +114,7 @@ internal class BeerCalendarServiceTest {
     @Test
     fun testDeleteBeerCalendarExist() {
         every { beerCalendarRepository.existsById(any()) } returns true
+        every { beerCalendarRepository.deleteById(any()) } just Runs
         val deleted = testSubject.delete(beerCalendarEntity.id)
         Assertions.assertTrue(deleted)
     }

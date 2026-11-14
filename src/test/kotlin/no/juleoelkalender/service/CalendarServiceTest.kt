@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.Optional
+import java.util.UUID
 
 internal class CalendarServiceTest {
     private val calendarTokenMapper = CalendarTokenMapper()
@@ -52,7 +53,7 @@ internal class CalendarServiceTest {
 
     @Test
     fun testGetCalendars() {
-        every { calendarRepository.findAll() } returns listOf(calendarEntity, calendarEntity, calendarEntity)
+        every { calendarRepository.findAll() } returns listOf(calendarEntity, getCalendarEntity().apply { id = UUID.randomUUID() }, getCalendarEntity().apply { id = UUID.randomUUID() })
 
         val calendars = testSubject.all
         Assertions.assertAll(

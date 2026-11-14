@@ -35,6 +35,7 @@ import org.springframework.web.cors.CorsConfiguration
 class SecurityConfiguration {
     @Value($$"${app.jwt.secret_key}")
     private lateinit var tokenHeader: String
+
     @Value($$"#{'${app.cors.origins:}'.split(',')}")
     private lateinit var origins: MutableList<String>
     private lateinit var jwtService: JwtService

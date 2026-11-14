@@ -1,6 +1,5 @@
 package no.juleoelkalender.service.impl
 
-import no.juleoelkalender.entity.BeerCalendarEntity
 import no.juleoelkalender.entity.CalendarEntity
 import no.juleoelkalender.entity.CalendarTokenEntity
 import no.juleoelkalender.mappers.BeerCalendarMapper
@@ -15,9 +14,7 @@ import no.juleoelkalender.service.CalendarService
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.util.UUID
-import java.util.stream.Collectors
 import kotlin.jvm.optionals.getOrNull
-import kotlin.jvm.optionals.toSet
 
 @Service
 class CalendarServiceImpl(
@@ -34,24 +31,16 @@ class CalendarServiceImpl(
     }
 
     override fun getCalendarWithBeers(calendarId: UUID): Set<CalendarWithBeer> {
-        val calendarWithBeers: MutableSet<CalendarWithBeer> = mutableSetOf()
-        repository.findById(calendarId).map {
-            for (beerCalendar in it.beerCalendars) {
-                val beer = beerCalendar.beer
-                val calendarWithBeer = CalendarWithBeer(
-                    it.id!!,
-                    it.name, it.year, it.published,
-                    it.archived,
-                    it.beerCalendars.stream().map { entity: BeerCalendarEntity? -> beerCalendarMapper.entityToModel(entity!!) }
-                        .collect(Collectors.toSet()), calendarTokenMapper.entityToModel(
-                        it.calendarToken
-                    ),
-                    beerMapper.entityToModel(beer), beerCalendar.day)
-                calendarWithBeers.add(calendarWithBeer)
-
-            }
+        val calendar = repository.findById(calendarId).getOrNull() ?: return emptySet()
+        val beerCalendars = calendar.beerCalendars.map(beerCalendarMapper::entityToModel).toSet()
+        val calendarToken = calendarTokenMapper.entityToModel(calendar.calendarToken)
+        return calendar.beerCalendars.map { beerCalendar ->
+            CalendarWithBeer(
+                calendar.id!!, calendar.name, calendar.year, calendar.published,
+                calendar.archived, beerCalendars, calendarToken,
+                beerMapper.entityToModel(beerCalendar.beer), beerCalendar.day
+            )
         }.toSet()
-        return calendarWithBeers
     }
 
     override fun mapModelToEntity(model: Calendar, entity: CalendarEntity) {

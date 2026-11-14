@@ -1,6 +1,5 @@
 package no.juleoelkalender.filter
 
-import io.jsonwebtoken.Claims
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
@@ -39,12 +38,12 @@ class JWTTokenValidatorFilter(private val jwtKey: String, private val userReposi
         if (null != jwt && jwt.length > 7) {
             try {
                 val token = jwt.replace("Bearer ", "")
-                val claims: Claims = extractAllClaims(token, jwtKey)
-                val username = claims["username"]?.toString().orEmpty()
+                val claims = extractAllClaims(token, jwtKey)
+                val username = claims.getClaimAsString("username").orEmpty()
                 if (userRepository.findByEmailIgnoreCase(username) == null) {
                     throw BadCredentialsException("Invalid Token received!")
                 }
-                val authorities: String = claims["authorities"] as String
+                val authorities: String = requireNotNull(claims.getClaimAsString("authorities"))
                 val auth: Authentication = UsernamePasswordAuthenticationToken(
                     username, "",
                     AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)

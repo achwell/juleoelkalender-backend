@@ -1,21 +1,26 @@
 package no.juleoelkalender.model
 
+import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.NotNull
 import java.time.ZonedDateTime
 import java.util.UUID
 
+@Schema(description = "En brukers anmeldelse av et øl i en kalender.")
 data class Review(
+    @field:Schema(description = "Identifikator for anmeldelsen.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     var id: UUID?,
-    var ratingLabel: Double,
-    var ratingLooks: Double,
-    var ratingSmell: Double,
-    var ratingTaste: Double,
-    var ratingFeel: Double,
-    var ratingOverall: Double,
+    @field:NotNull var ratingLabel: Double,
+    @field:NotNull var ratingLooks: Double,
+    @field:NotNull var ratingSmell: Double,
+    @field:NotNull var ratingTaste: Double,
+    @field:NotNull var ratingFeel: Double,
+    @field:NotNull var ratingOverall: Double,
+    @field:Schema(description = "Fritekst om ølet.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     var comment: String?,
-    var createdAt: ZonedDateTime,
-    var beer: Beer,
-    var calendar: Calendar,
-    var user: UserWithoutChildren
+    @field:NotNull var createdAt: ZonedDateTime,
+    @field:NotNull var beer: Beer,
+    @field:NotNull var calendar: Calendar,
+    @field:NotNull var user: UserWithoutChildren
 ) {
 
     fun updateRatings(review: Review) {

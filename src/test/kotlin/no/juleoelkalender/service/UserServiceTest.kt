@@ -6,6 +6,7 @@ import io.mockk.just
 import io.mockk.mockk
 import no.juleoelkalender.entity.RoleEntity
 import no.juleoelkalender.entity.UserEntity
+import no.juleoelkalender.getCalendarTokenEntity
 import no.juleoelkalender.getRoleEntityUser
 import no.juleoelkalender.getUser
 import no.juleoelkalender.getUserEntity
@@ -22,14 +23,17 @@ import no.juleoelkalender.repository.RoleRepository
 import no.juleoelkalender.repository.UserRepository
 import no.juleoelkalender.service.impl.UserServiceImpl
 import no.juleoelkalender.utils.ExcelGenerator
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.Locale
 import java.util.Optional
+import java.util.UUID
 
 internal class UserServiceTest {
     private val userRepository = mockk<UserRepository>()
@@ -48,6 +52,11 @@ internal class UserServiceTest {
     private lateinit var user: User
     private lateinit var userEntity: UserEntity
 
+    @AfterEach
+    fun clearSecurityContext() {
+        SecurityContextHolder.clearContext()
+    }
+
     @BeforeEach
     fun setUp() {
         roleEntityUser = getRoleEntityUser()
@@ -58,7 +67,7 @@ internal class UserServiceTest {
 
     @Test
     fun testGetUsers() {
-        every { userRepository.findAll() } returns listOf(userEntity, userEntity, userEntity)
+        every { userRepository.findAll() } returns listOf(userEntity, getUserEntity().apply { id = UUID.randomUUID() }, getUserEntity().apply { id = UUID.randomUUID() })
 
         val users = testSubject.all
         Assertions.assertAll(
@@ -97,6 +106,7 @@ internal class UserServiceTest {
     fun testCreateUserOK() {
         every { userRepository.findByEmailIgnoreCase(any()) } returns null
         every { roleRepository.findRoleEntityByName(any()) } returns roleEntityUser
+        every { calendarTokenRepository.findCalendarTokenByToken(any()) } returns getCalendarTokenEntity()
         every { userRepository.save(any()) } returns userEntity
         val user = testSubject.create(userMapper.entityToModel(userEntity))
         Assertions.assertAll(
@@ -116,6 +126,7 @@ internal class UserServiceTest {
     fun testUpdateUser() {
         every { userRepository.findById(any()) } returns Optional.of(userEntity)
         every { roleRepository.findRoleEntityByName(any()) } returns roleEntityUser
+        every { calendarTokenRepository.findCalendarTokenByToken(any()) } returns getCalendarTokenEntity()
         every { userRepository.save(any()) } returns userEntity
         val user = userMapper.entityToModel(userEntity)
         user.pwd = "new password"
@@ -147,6 +158,7 @@ internal class UserServiceTest {
 
     @Test
     fun testDeleteUserDontExist() {
+        every { deviceRepository.deleteByUserId(any()) } just Runs
         every { userRepository.existsById(any()) } returns false
         val deleted = testSubject.delete(userEntity.id!!)
         Assertions.assertFalse(deleted)
