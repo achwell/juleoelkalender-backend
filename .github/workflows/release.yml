@@ -1,0 +1,101 @@
+name: Release backend
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-backend
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Run this workflow from main."
+          exit 1
+
+      - uses: actions/checkout@v5.0.0
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v5.0.0
+        with:
+          distribution: oracle
+          java-version: '25'
+          cache: maven
+
+      - name: Determine release versions
+        id: versions
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse("pom.xml").getroot()
+          current = root.findtext("{http://maven.apache.org/POM/4.0.0}version")
+          match = re.fullmatch(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)-SNAPSHOT", current or "")
+          if not match:
+              raise SystemExit(f"Expected a MAJOR.MINOR.PATCH-SNAPSHOT version, got {current!r}")
+          major, minor, patch = match.groups()
+          release = f"{major}.{minor}.{patch}"
+          next_version = f"{major}.{minor}.{int(patch) + 1}-SNAPSHOT"
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              print(f"release={release}", file=output)
+              print(f"next={next_version}", file=output)
+          PY
+      - name: Check release tag
+        env:
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+        run: |
+          if git rev-parse --verify --quiet "refs/tags/version/$RELEASE_VERSION"; then
+            echo "::error::Release tag already exists."
+            exit 1
+          fi
+
+      - name: Set release version
+        env:
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+        run: ./mvnw --batch-mode versions:set -DnewVersion="$RELEASE_VERSION" -DgenerateBackupPoms=false
+
+      - name: Commit and tag release
+        env:
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pom.xml
+          git commit -m "Release $RELEASE_VERSION"
+          git tag "version/$RELEASE_VERSION"
+
+      - name: Build and verify release
+        env:
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+        run: |
+          ./mvnw --batch-mode clean verify
+          test -f "target/juleoelkalender-backend-$RELEASE_VERSION.jar"
+
+      - name: Advance development version and push
+        env:
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+          NEXT_VERSION: ${{ steps.versions.outputs.next }}
+        run: |
+          ./mvnw --batch-mode versions:set -DnewVersion="$NEXT_VERSION" -DgenerateBackupPoms=false
+          git add pom.xml
+          git commit -m "Start $NEXT_VERSION"
+          git push --atomic origin HEAD:refs/heads/main "refs/tags/version/$RELEASE_VERSION"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ steps.versions.outputs.release }}
+        run: |
+          gh release create "version/$RELEASE_VERSION" \
+            "target/juleoelkalender-backend-$RELEASE_VERSION.jar" \
+            --verify-tag --title "Backend $RELEASE_VERSION" --generate-notes
