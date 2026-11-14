@@ -10,7 +10,7 @@
     </parent>
     <groupId>no.juleoelkalender</groupId>
     <artifactId>juleoelkalender-backend</artifactId>
-    <version>1.1.27-SNAPSHOT</version>
+    <version>1.1.27</version>
     <name>backend</name>
     <description>backend</description>
     <scm>
