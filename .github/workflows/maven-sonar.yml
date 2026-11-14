@@ -1,4 +1,4 @@
-name: Maven Build & SonarQube
+name: Maven Build
 
 on:
   push:
@@ -19,16 +19,5 @@ jobs:
           java-version: '25'
           cache: maven
 
-      - name: Build and analyze with Maven
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -z "$SONAR_HOST_URL" ] || [ -z "$SONAR_TOKEN" ]; then
-            echo "::error::SONAR_HOST_URL and SONAR_TOKEN must be configured as repository secrets."
-            exit 1
-          fi
-          mvn clean verify sonar:sonar \
-            "-Dsonar.host.url=$SONAR_HOST_URL" \
-            "-Dsonar.token=$SONAR_TOKEN"
+      - name: Build and verify with Maven
+        run: mvn clean verify
