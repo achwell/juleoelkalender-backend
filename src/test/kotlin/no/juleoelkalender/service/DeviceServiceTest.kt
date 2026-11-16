@@ -2,6 +2,7 @@ package no.juleoelkalender.service
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.juleoelkalender.entity.DeviceEntity
 import no.juleoelkalender.getDevice
 import no.juleoelkalender.getDeviceEntity
@@ -12,6 +13,7 @@ import no.juleoelkalender.mappers.RoleMapper
 import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.Device
 import no.juleoelkalender.repository.DeviceRepository
+import no.juleoelkalender.repository.UserRepository
 import no.juleoelkalender.service.impl.DeviceServiceImpl
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -25,6 +27,7 @@ internal class DeviceServiceTest {
     private lateinit var testSubject: DeviceService
 
     private val deviceRepository = mockk<DeviceRepository>()
+    private val userRepository = mockk<UserRepository>()
     private lateinit var device: Device
     private lateinit var deviceEntity: DeviceEntity
 
@@ -37,7 +40,7 @@ internal class DeviceServiceTest {
         val roleMapper = RoleMapper(authorityMapper)
         val userWithoutChildrenMapper = UserWithoutChildrenMapper(calendarTokenMapper, roleMapper)
         val deviceMapper = DeviceMapper(userWithoutChildrenMapper)
-        testSubject = DeviceServiceImpl(deviceRepository, deviceMapper, userWithoutChildrenMapper)
+        testSubject = DeviceServiceImpl(deviceRepository, deviceMapper, userRepository)
     }
 
     @Test
@@ -52,6 +55,7 @@ internal class DeviceServiceTest {
 
     @Test
     fun testCreateDevice() {
+        every { userRepository.getReferenceById(any()) } returns deviceEntity.user
         every { deviceRepository.save(any()) } returns deviceEntity
         val result = testSubject.create(device)
         assertAll(
@@ -60,13 +64,20 @@ internal class DeviceServiceTest {
             { assertTrue(result.isMobile) },
             { assertEquals(deviceEntity.browserName, result.browserName) }
         )
+        verify(exactly = 1) { deviceRepository.save(any()) }
     }
 
     @Test
     fun testUpdate() {
+        every { userRepository.getReferenceById(any()) } returns deviceEntity.user
         every { deviceRepository.findById(any()) } returns Optional.of(deviceEntity)
         every { deviceRepository.save(any()) } returns deviceEntity
         val updated = testSubject.update(device.id, device)
         assertNotNull(updated)
+    }
+
+    @Test
+    fun testUserDisplayName() {
+        assertEquals("FIRST LAST", device.user.name())
     }
 }

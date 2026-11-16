@@ -4,6 +4,7 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.slot
 import jakarta.mail.MessagingException
 import no.juleoelkalender.config.MailProperties
 import no.juleoelkalender.entity.PasswordChangeRequestEntity
@@ -39,7 +40,13 @@ internal class PasswordChangeRequestServiceTest {
         mailProperties.baseUrl = "http://localhost"
         mailProperties.from = "first@last.no"
         mailProperties.supportEmail = "first@last.no"
-        testSubject = PasswordChangeRequestServiceImpl(passwordChangeRequestRepository, emailService, passwordChangeRequestMapper, mailProperties, ByteArrayResource("".toByteArray()))
+        testSubject = PasswordChangeRequestServiceImpl(
+            passwordChangeRequestRepository,
+            emailService,
+            passwordChangeRequestMapper,
+            mailProperties,
+            ByteArrayResource($$"Expiry: ${expires}".toByteArray())
+        )
     }
 
     @Test
@@ -74,14 +81,16 @@ internal class PasswordChangeRequestServiceTest {
             UUID.randomUUID(), pcr.token,
             pcr.email, ZonedDateTime.now()
         )
+        val emailBody = slot<String>()
         every { passwordChangeRequestRepository.save(any()) } returns passwordChangeRequestEntity
-        every { emailService.sendSimpleMessage(any(), any(), any(), any()) } just Runs
+        every { emailService.sendSimpleMessage(any(), any(), any(), capture(emailBody)) } just Runs
         val newPasswordChangeRequest = testSubject.create(passwordChangeRequest)
         assertAll(
             { assertNotNull(newPasswordChangeRequest) },
             { assertEquals(passwordChangeRequestEntity.id, newPasswordChangeRequest.id) },
             { assertEquals(passwordChangeRequestEntity.token, newPasswordChangeRequest.token) },
-            { assertEquals(passwordChangeRequestEntity.email, newPasswordChangeRequest.email) }
+            { assertEquals(passwordChangeRequestEntity.email, newPasswordChangeRequest.email) },
+            { assertTrue(Regex("""Expiry: \d{2}\.\d{2}\.\d{4} \d{2}:\d{2}""").matches(emailBody.captured)) }
         )
     }
 
@@ -116,5 +125,13 @@ internal class PasswordChangeRequestServiceTest {
         every { passwordChangeRequestRepository.existsById(any()) } returns false
         val deleted = testSubject.delete(passwordChangeRequestEntity.id)
         assertFalse(deleted)
+    }
+
+    @Test
+    fun testDeleteExpiredRequestsUsesBulkDelete() {
+        val cutoff = ZonedDateTime.now().minusHours(2)
+        every { passwordChangeRequestRepository.deleteExpiredBefore(cutoff) } returns 2
+
+        assertEquals(2, testSubject.deleteExpiredBefore(cutoff))
     }
 }

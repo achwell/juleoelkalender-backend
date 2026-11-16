@@ -159,7 +159,9 @@ class ReviewServiceImpl(
     }
 
     private fun toReviewWithUser(reviews: List<Review>): ReviewWithUser {
-        val latestReview = reviews.last()
+        val latestReview = reviews.maxWithOrNull(
+            compareBy<Review> { it.createdAt }.thenBy { it.id.toString() }
+        ) ?: throw IllegalArgumentException("Cannot aggregate an empty review group")
         latestReview.updateRatings(calculateAverage(reviews, latestReview.calendar, latestReview.beer, latestReview.beer.brewer))
         return toReviewWithTotal(latestReview.beer, latestReview)
     }

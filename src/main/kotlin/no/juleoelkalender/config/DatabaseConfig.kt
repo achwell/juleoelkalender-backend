@@ -12,8 +12,6 @@ class DatabaseConfig(private val passwordChangeRequestService: PasswordChangeReq
 
     @Scheduled(cron = "0 * * * * *")
     fun cleanPasswordRequest() {
-        passwordChangeRequestService.all
-            .filter { it.created.isBefore(ZonedDateTime.now().minusHours(2)) }
-            .forEach { passwordChangeRequestService.delete(it.id) }
+        passwordChangeRequestService.deleteExpiredBefore(ZonedDateTime.now().minusHours(2))
     }
 }

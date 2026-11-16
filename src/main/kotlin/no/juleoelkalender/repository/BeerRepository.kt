@@ -7,4 +7,8 @@ import java.util.UUID
 
 interface BeerRepository : JpaRepository<BeerEntity, UUID> {
     fun findBeerEntityByUser(user: UserEntity): Collection<BeerEntity>
+
+    fun countByArchivedFalse(): Long
+
+    fun findFirstByArchivedFalseOrderByCreatedDateDesc(): BeerEntity?
 }

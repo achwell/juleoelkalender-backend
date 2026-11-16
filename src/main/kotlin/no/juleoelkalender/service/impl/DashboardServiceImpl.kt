@@ -42,55 +42,54 @@ class DashboardServiceImpl(
             }
             val diskSpaceHealthIndicators = healthIndicators.filterIsInstance<DiskSpaceHealthIndicator>()
             if (diskSpaceHealthIndicators.isEmpty()) {
-                RuntimeException("Health check for disk space not activated")
+                throw IllegalStateException("Health check for disk space not activated")
             }
             val diskDetails = diskSpaceHealthIndicators.firstOrNull()?.health(true)?.details.orEmpty()
             val dbStatus = healthEndpoint.healthForPath("db")?.status?.code
             val emailStatus = healthEndpoint.healthForPath("email")?.status?.code
             val backendStatus = healthEndpoint.health().status.code
-            val totalDisk = diskDetails["total"] as Long
-            val freeDisk = diskDetails["free"] as Long
+            val totalDisk = diskDetails["total"] as? Long
+                ?: throw IllegalStateException("Disk space health check did not provide total disk space")
+            val freeDisk = diskDetails["free"] as? Long
+                ?: throw IllegalStateException("Disk space health check did not provide free disk space")
 
-            val totalMemory = getGetMeasurement("jvm.memory.max")
-            val usedMemory = getGetMeasurement("jvm.memory.used")
-            val cpuLoad = getGetMeasurement("system.cpu.usage")
-            val processUptime = getGetMeasurement("process.uptime")
+            val totalMemory = getMeasurement("jvm.memory.max")
+            val usedMemory = getMeasurement("jvm.memory.used")
+            val cpuLoad = getMeasurement("system.cpu.usage")
+            val processUptime = getMeasurement("process.uptime")
 
-            val users = userService.all
-            val newestUser = users.maxByOrNull { it.createdDate }
-            val activeUsers = users.filter { user -> !user.calendarToken.none { it.active } }
-            val newestActiveUser = activeUsers.maxByOrNull { it.createdDate }
-            val beers = beerService.all.filter { !it.archived }
+            val newestUser = userService.getNewestUser()
+            val newestActiveUser = userService.getNewestActiveUser()
             val year = LocalDate.now().year
-            val placedBeers = beerService.getBeersWithCalendar(null, null)
-                .filter { it.calendar?.year == year }
-            val newestBeer = beers.maxByOrNull { it.createdDate }
-            val activeCalendars = calendarService.all.filter { !it.archived && it.year == year }
+            val placedBeers = beerService.countPlacedBeersForYear(year)
+            val activeBeers = beerService.countActiveBeers()
+            val newestBeer = beerService.getNewestActiveBeer()
+            val activeCalendars = calendarService.countActiveCalendarsForYear(year)
             val devices = deviceService.all.toMutableSet()
             return DashboardData(
                 backendVersion,
-                backendBuildTime!!,
+                checkNotNull(backendBuildTime) { "Build time is missing from application info" },
                 cpuLoad,
                 freeDisk / 1024 / 1024 / 1024,
                 (freeDisk * 100) / totalDisk,
                 (totalMemory - usedMemory) / 1024 / 1024 / 1024,
                 processUptime,
                 devices,
-                dbStatus!!,
-                emailStatus!!,
+                checkNotNull(dbStatus) { "Database health status is unavailable" },
+                checkNotNull(emailStatus) { "Email health status is unavailable" },
                 backendStatus,
-                users.size,
-                newestUser?.userWithoutChildren!!,
-                activeUsers.size,
-                newestActiveUser?.userWithoutChildren!!,
-                beers.size,
-                beers.size - placedBeers.size,
-                (activeCalendars.size * 24) - placedBeers.size,
-                newestBeer!!
+                userService.countUsers().toInt(),
+                checkNotNull(newestUser?.userWithoutChildren) { "No users are available for the dashboard" },
+                userService.countActiveUsers().toInt(),
+                checkNotNull(newestActiveUser?.userWithoutChildren) { "No active users are available for the dashboard" },
+                activeBeers.toInt(),
+                activeBeers.toInt() - placedBeers.toInt(),
+                (activeCalendars.toInt() * 24) - placedBeers.toInt(),
+                newestBeer
             )
         }
 
-    private fun getGetMeasurement(measurement: String): Double {
+    private fun getMeasurement(measurement: String): Double {
         val metricDescriptor = metricsEndpoint.metric(measurement, listOf())
         return metricDescriptor?.measurements?.first()?.value ?: 0.0
     }

@@ -8,4 +8,10 @@ interface UserRepository : JpaRepository<UserEntity, UUID> {
     fun findByEmailIgnoreCase(email: String): UserEntity?
 
     fun findByFacebookUserId(facebookUserId: String): UserEntity?
+
+    fun countDistinctByCalendarToken_ActiveTrue(): Long
+
+    fun findFirstByOrderByCreatedDateDesc(): UserEntity?
+
+    fun findFirstByCalendarToken_ActiveTrueOrderByCreatedDateDesc(): UserEntity?
 }

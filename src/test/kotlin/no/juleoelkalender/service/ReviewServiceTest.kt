@@ -154,6 +154,35 @@ internal class ReviewServiceTest {
     }
 
     @Test
+    fun testGetReviewsWithUserSelectsNewestReviewDeterministically() {
+        val newerReview = ReviewEntity(
+            UUID.randomUUID(),
+            2.0, 2.0, 2.0, 2.0, 2.0, 2.0,
+            "newer",
+            reviewEntity.createdAt.plusSeconds(1),
+            reviewEntity.createdAt.plusSeconds(1),
+            reviewEntity.beer,
+            reviewEntity.calendar,
+            reviewEntity.user
+        )
+        val authentication = mockk<Authentication>()
+        val securityContext = mockk<SecurityContext>()
+        every { securityContext.authentication } returns authentication
+        SecurityContextHolder.setContext(securityContext)
+        every { SecurityContextHolder.getContext().authentication?.principal } returns userEntity.email
+        every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
+        every {
+            reviewRepository.findByCalendar_CalendarToken_Id(userEntity.calendarToken.first { it.active }.id)
+        } returns listOf(newerReview, reviewEntity)
+
+        val review = testSubject.reviewsWithUser.single()
+
+        Assertions.assertEquals(newerReview.id, review.id)
+        Assertions.assertEquals("newer", review.comment)
+        Assertions.assertEquals(1.5, review.ratingOverall)
+    }
+
+    @Test
     fun testGetReviewById() {
         every { reviewRepository.findById(any()) } returns Optional.of(reviewEntity)
         val review = testSubject.getById(reviewEntity.id)

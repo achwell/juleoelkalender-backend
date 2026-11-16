@@ -7,4 +7,6 @@ import java.util.UUID
 
 interface CalendarRepository : JpaRepository<CalendarEntity, UUID> {
     fun findByCalendarToken(calendarToken: CalendarTokenEntity): Collection<CalendarEntity>
+
+    fun countByArchivedFalseAndYear(year: Int): Long
 }

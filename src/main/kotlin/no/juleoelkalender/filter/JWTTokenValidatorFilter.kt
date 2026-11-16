@@ -34,24 +34,28 @@ class JWTTokenValidatorFilter(private val jwtKey: String, private val userReposi
     }
 
     private fun validateToken(request: HttpServletRequest) {
-        val jwt = request.getHeader(HttpHeaders.AUTHORIZATION)
-        if (null != jwt && jwt.length > 7) {
-            try {
-                val token = jwt.replace("Bearer ", "")
-                val claims = extractAllClaims(token, jwtKey)
-                val username = claims.getClaimAsString("username").orEmpty()
-                if (userRepository.findByEmailIgnoreCase(username) == null) {
-                    throw BadCredentialsException("Invalid Token received!")
-                }
-                val authorities: String = requireNotNull(claims.getClaimAsString("authorities"))
-                val auth: Authentication = UsernamePasswordAuthenticationToken(
-                    username, "",
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)
-                )
-                SecurityContextHolder.getContext().authentication = auth
-            } catch (e: Exception) {
-                throw BadCredentialsException("Invalid Token received!", e)
+        val authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION)
+        if (authorizationHeader?.startsWith("Bearer ", ignoreCase = true) != true) {
+            return
+        }
+        try {
+            val token = authorizationHeader.substring(7).trim()
+            if (token.isEmpty()) {
+                throw BadCredentialsException("Invalid Token received!")
             }
+            val claims = extractAllClaims(token, jwtKey)
+            val username = claims.getClaimAsString("username").orEmpty()
+            if (userRepository.findByEmailIgnoreCase(username) == null) {
+                throw BadCredentialsException("Invalid Token received!")
+            }
+            val authorities: String = requireNotNull(claims.getClaimAsString("authorities"))
+            val auth: Authentication = UsernamePasswordAuthenticationToken(
+                username, "",
+                AuthorityUtils.commaSeparatedStringToAuthorityList(authorities)
+            )
+            SecurityContextHolder.getContext().authentication = auth
+        } catch (e: Exception) {
+            throw BadCredentialsException("Invalid Token received!", e)
         }
     }
 

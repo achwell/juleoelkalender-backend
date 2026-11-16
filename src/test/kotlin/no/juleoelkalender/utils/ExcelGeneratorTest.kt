@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.IOException
 import java.time.ZonedDateTime
 
@@ -60,5 +61,22 @@ internal class ExcelGeneratorTest {
         )
         val bytes = excelGenerator.generateReport("Sheet 1", headers, rowData)
         assertNotNull(bytes)
+    }
+
+    @Test
+    fun testCreateContentCellSupportsLongAndRejectsUnsupportedTypes() {
+        val excelGenerator = ExcelGenerator()
+        XSSFWorkbook().use { workbook ->
+            val sheet = workbook.createSheet("Sheet 1")
+            val styles = excelGenerator.prepareStyles(workbook)
+            val row = sheet.createRow(0)
+
+            excelGenerator.createContentCell(row, 0, 42L, styles)
+            assertEquals(42.0, row.getCell(0).numericCellValue)
+
+            assertThrows<IllegalArgumentException> {
+                excelGenerator.createContentCell(row, 1, Any(), styles)
+            }
+        }
     }
 }

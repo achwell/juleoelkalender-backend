@@ -4,6 +4,7 @@ import io.mockk.mockk
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolation
 import jakarta.validation.ConstraintViolationException
+import no.juleoelkalender.exception.ConflictException
 import no.juleoelkalender.exception.InvalidTokenException
 import no.juleoelkalender.exception.NotFoundException
 import no.juleoelkalender.exception.UserExistException
@@ -150,6 +151,17 @@ internal class RestResponseEntityExceptionHandlerTest {
     fun testHandleConflict() {
         val responseEntity = testSubject.handleConflict(
             InvalidDataAccessApiUsageException(""), webRequest
+        )
+        assertAll(
+            { assertNotNull(responseEntity) },
+            { assertEquals(HttpStatusCode.valueOf(409), responseEntity?.statusCode) }
+        )
+    }
+
+    @Test
+    fun testHandleBusinessConflict() {
+        val responseEntity = testSubject.handleBusinessConflict(
+            ConflictException("Cannot remove the last active token"), webRequest
         )
         assertAll(
             { assertNotNull(responseEntity) },

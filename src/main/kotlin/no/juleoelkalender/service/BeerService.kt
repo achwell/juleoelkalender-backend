@@ -14,4 +14,10 @@ interface BeerService : BaseService<UUID, Beer> {
     fun getBeersWithCalendarXlsx(calendarId: UUID?, email: String?, locale: String): ByteArray
 
     fun getBeersWithCalendarAndReviewByDate(date: LocalDate): Set<BeerWithCalendarDayAndReview>
+
+    fun countActiveBeers(): Long
+
+    fun getNewestActiveBeer(): Beer?
+
+    fun countPlacedBeersForYear(year: Int): Long
 }

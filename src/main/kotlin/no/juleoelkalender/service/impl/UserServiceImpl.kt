@@ -70,6 +70,16 @@ class UserServiceImpl(
         return excelGenerator.generateReport(sheetname, headers, rowData)
     }
 
+    override fun countUsers(): Long = userRepository.count()
+
+    override fun countActiveUsers(): Long = userRepository.countDistinctByCalendarToken_ActiveTrue()
+
+    override fun getNewestUser(): User? = userRepository.findFirstByOrderByCreatedDateDesc()
+        ?.let { postGet(mapper.entityToModel(it)) }
+
+    override fun getNewestActiveUser(): User? = userRepository.findFirstByCalendarToken_ActiveTrueOrderByCreatedDateDesc()
+        ?.let { postGet(mapper.entityToModel(it)) }
+
     override fun preCreate(model: User): UserEntity {
         val existingUser = userRepository.findByEmailIgnoreCase(model.email)
         if (existingUser != null) {

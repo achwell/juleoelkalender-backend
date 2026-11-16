@@ -90,7 +90,7 @@ class ExcelGenerator {
     fun createContentCell(
         row: XSSFRow, columnIndex: Int, content: Any?,
         styles: Map<CustomCellStyle, CellStyle>
-    ): XSSFCell? {
+    ): XSSFCell {
         when (content) {
             is String -> {
                 return createStringContentCell(row, columnIndex, content, styles)
@@ -107,8 +107,29 @@ class ExcelGenerator {
             is ZonedDateTime -> {
                 return createZonedDateTimeContentCell(row, columnIndex, content, styles)
             }
+
+            is Number -> {
+                return row.createCell(columnIndex).apply {
+                    setCellValue(content.toDouble())
+                    setCellStyle(styles[CustomCellStyle.RIGHT_ALIGNED])
+                }
+            }
+
+            is Boolean -> {
+                return row.createCell(columnIndex).apply {
+                    setCellValue(content)
+                    setCellStyle(styles[CustomCellStyle.LEFT_ALIGNED])
+                }
+            }
+
+            null -> {
+                return row.createCell(columnIndex).apply {
+                    setCellStyle(styles[CustomCellStyle.LEFT_ALIGNED])
+                }
+            }
+
+            else -> throw IllegalArgumentException("Unsupported Excel cell value type: ${content::class.qualifiedName}")
         }
-        return null
     }
 
     private fun createStringContentCell(

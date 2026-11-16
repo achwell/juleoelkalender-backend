@@ -23,12 +23,14 @@ import no.juleoelkalender.mappers.ReviewMapper
 import no.juleoelkalender.mappers.RoleMapper
 import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.Beer
+import no.juleoelkalender.repository.BeerCalendarRepository
 import no.juleoelkalender.repository.BeerRepository
 import no.juleoelkalender.repository.BeerStyleRepository
 import no.juleoelkalender.repository.CalendarRepository
 import no.juleoelkalender.repository.UserRepository
 import no.juleoelkalender.service.impl.BeerServiceImpl
 import no.juleoelkalender.utils.ExcelGenerator
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -38,6 +40,7 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import java.io.ByteArrayInputStream
 import java.time.LocalDate
 import java.time.Month
 import java.time.ZonedDateTime
@@ -52,6 +55,7 @@ internal class BeerServiceTest {
     private val reviewMapper = ReviewMapper(beerMapper, calendarMapper, userWithoutChildrenMapper)
 
     private val beerRepository = mockk<BeerRepository>()
+    private val beerCalendarRepository = mockk<BeerCalendarRepository>()
     private val beerStyleRepository = mockk<BeerStyleRepository>()
     private val calendarRepository = mockk<CalendarRepository>()
     private val userRepository = mockk<UserRepository>()
@@ -78,6 +82,7 @@ internal class BeerServiceTest {
         userEntity = getUserEntity()
         testSubject = BeerServiceImpl(
             beerRepository,
+            beerCalendarRepository,
             beerStyleRepository,
             calendarRepository,
             userRepository,
@@ -161,6 +166,14 @@ internal class BeerServiceTest {
             { Assertions.assertNotNull(beers.first().calendar) },
             { Assertions.assertNotNull(beers.first().brewer) }
         )
+    }
+
+    @Test
+    fun getBeersWithCalendarReturnsEmptyForUnknownEmail() {
+        every { userRepository.findByEmailIgnoreCase(any()) } returns null
+
+        Assertions.assertTrue(testSubject.getBeersWithCalendar(null, "missing@example.no").isEmpty())
+        io.mockk.verify(exactly = 0) { beerRepository.findAll() }
     }
 
     @Test
@@ -345,6 +358,7 @@ internal class BeerServiceTest {
     @Test
     fun testGetBeersWithCalendarXlsx() {
         val locale = "no"
+        beerEntity.archived = true
 
         val authentication = mockk<Authentication>()
         val securityContext = mockk<SecurityContext>()
@@ -362,12 +376,16 @@ internal class BeerServiceTest {
         every { localesService.getString(locale, "pages.beeradmin.dayincalendar") } returns "dayincalendar"
         every { localesService.getString(locale, "menu.allbeers") } returns "allbeers"
         every { localesService.getString(locale, "common.yes") } returns "yes"
+        every { localesService.getString(locale, "common.no") } returns "no"
         every { beerRepository.findAll() } returns listOf(beerEntity)
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
         every { beerRepository.findBeerEntityByUser(any()) } returns listOf(beerEntity)
 
         val xlsx = testSubject.getBeersWithCalendarXlsx(calendarEntity.id, userEntity.email, locale)
         Assertions.assertNotNull(xlsx)
+        XSSFWorkbook(ByteArrayInputStream(xlsx)).use { workbook ->
+            Assertions.assertEquals("yes", workbook.getSheetAt(0).getRow(1).getCell(4).stringCellValue)
+        }
     }
 
     @Test
@@ -389,6 +407,7 @@ internal class BeerServiceTest {
         every { localesService.getString(locale, "pages.beeradmin.dayincalendar") } returns "dayincalendar"
         every { localesService.getString(locale, "menu.allbeers") } returns "allbeers"
         every { localesService.getString(locale, "common.yes") } returns "yes"
+        every { localesService.getString(locale, "common.no") } returns "no"
         every { beerRepository.findAll() } returns listOf(beerEntity)
         every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
         every { beerRepository.findBeerEntityByUser(any()) } returns listOf(beerEntity)

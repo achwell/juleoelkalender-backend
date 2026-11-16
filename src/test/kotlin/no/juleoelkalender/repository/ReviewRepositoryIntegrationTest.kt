@@ -2,6 +2,7 @@ package no.juleoelkalender.repository
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
+import no.juleoelkalender.entity.BeerCalendarEntity
 import no.juleoelkalender.entity.BeerEntity
 import no.juleoelkalender.entity.CalendarEntity
 import no.juleoelkalender.entity.CalendarTokenEntity
@@ -27,6 +28,7 @@ class ReviewRepositoryIntegrationTest {
 
     private lateinit var entityManager: EntityManager
     private lateinit var repository: ReviewRepository
+    private lateinit var beerCalendarRepository: BeerCalendarRepository
     private lateinit var token: CalendarTokenEntity
     private lateinit var otherToken: CalendarTokenEntity
     private lateinit var beer: BeerEntity
@@ -44,6 +46,7 @@ class ReviewRepositoryIntegrationTest {
         entityManager = entityManagerFactory.createEntityManager()
         entityManager.transaction.begin()
         repository = JpaRepositoryFactory(entityManager).getRepository(ReviewRepository::class.java)
+        beerCalendarRepository = JpaRepositoryFactory(entityManager).getRepository(BeerCalendarRepository::class.java)
 
         val role = persist(RoleEntity(UUID.randomUUID(), RoleNameEntity.ROLE_USER, mutableSetOf(), mutableSetOf()))
         reviewer = user("first@example.no", role)
@@ -51,10 +54,13 @@ class ReviewRepositoryIntegrationTest {
         token = token("first")
         otherToken = token("second")
         calendar = calendar("first", token)
-        secondCalendar = calendar("second", token)
+        secondCalendar = calendar("second", token, archived = true)
         otherCalendar = calendar("third", otherToken)
         beer = beer("first", reviewer)
-        otherBeer = beer("second", reviewer)
+        otherBeer = beer("second", reviewer, archived = true)
+        persist(BeerCalendarEntity(UUID.randomUUID(), 1, beer, calendar))
+        persist(BeerCalendarEntity(UUID.randomUUID(), 2, otherBeer, calendar))
+        persist(BeerCalendarEntity(UUID.randomUUID(), 3, beer, secondCalendar))
         reviews = listOf(
             review(beer, calendar, reviewer),
             review(otherBeer, calendar, reviewer),
@@ -112,6 +118,12 @@ class ReviewRepositoryIntegrationTest {
     }
 
     @Test
+    fun activePlacementCountExcludesArchivedBeersAndCalendars() {
+        assertEquals(1L, beerCalendarRepository.countActiveBeerPlacementsForYear(2026))
+        assertEquals(0L, beerCalendarRepository.countActiveBeerPlacementsForYear(2025))
+    }
+
+    @Test
     fun exactQueryMatchesBeerCalendarAndReviewerTogether() {
         for (expected in reviews) {
             val actual = repository.findByBeerAndCalendarAndUser(
@@ -155,16 +167,25 @@ class ReviewRepositoryIntegrationTest {
         )
     )
 
-    private fun calendar(name: String, token: CalendarTokenEntity) = persist(
+    private fun calendar(name: String, token: CalendarTokenEntity, archived: Boolean = false) = persist(
         CalendarEntity(
-            id = null, name = name, year = 2026, published = false, archived = false, beerCalendars = mutableSetOf(), calendarToken = token, reviews = mutableSetOf(), createdDate = now, updatedDate = now
+            id = null,
+            name = name,
+            year = 2026,
+            published = false,
+            archived = archived,
+            beerCalendars = mutableSetOf(),
+            calendarToken = token,
+            reviews = mutableSetOf(),
+            createdDate = now,
+            updatedDate = now
         )
     )
 
-    private fun beer(name: String, brewer: UserEntity) = persist(
+    private fun beer(name: String, brewer: UserEntity, archived: Boolean = false) = persist(
         BeerEntity(
             id = UUID.randomUUID(), name = name, style = "Stout", description = null, abv = 5.0, ibu = 20.0, ebc = 50.0, recipe = null, untapped = null, brewedDate = now, bottleDate = now,
-            archived = false, user = brewer, beerCalendars = mutableSetOf(), reviews = mutableSetOf(), createdDate = now, updatedDate = now, desiredDate = null
+            archived = archived, user = brewer, beerCalendars = mutableSetOf(), reviews = mutableSetOf(), createdDate = now, updatedDate = now, desiredDate = null
         )
     )
 

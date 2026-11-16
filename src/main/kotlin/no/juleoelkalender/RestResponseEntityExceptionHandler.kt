@@ -2,6 +2,7 @@ package no.juleoelkalender
 
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolationException
+import no.juleoelkalender.exception.ConflictException
 import no.juleoelkalender.exception.InvalidTokenException
 import no.juleoelkalender.exception.NotFoundException
 import no.juleoelkalender.exception.UserExistException
@@ -69,6 +70,10 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(InvalidDataAccessApiUsageException::class, DataAccessException::class)
     fun handleConflict(ex: RuntimeException, request: WebRequest): ResponseEntity<in Any>? =
         handleExceptionInternal(ex, "Problemer med tilgang til ressurs", HttpHeaders(), HttpStatus.CONFLICT, request)
+
+    @ExceptionHandler(ConflictException::class)
+    fun handleBusinessConflict(ex: ConflictException, request: WebRequest): ResponseEntity<in Any>? =
+        handleExceptionInternal(ex, ex.localizedMessage, HttpHeaders(), HttpStatus.CONFLICT, request)
 
     // 412
     // 500

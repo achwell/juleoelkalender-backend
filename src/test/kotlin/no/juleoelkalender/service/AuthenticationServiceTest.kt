@@ -119,7 +119,8 @@ internal class AuthenticationServiceTest {
     @Test
     @Throws(MessagingException::class)
     fun testRegisterFirstUser() {
-        every { userRepository.findAll() } returns listOf()
+        every { userRepository.findByEmailIgnoreCase(any()) } returns null
+        every { userRepository.count() } returns 0L
         every { calendarTokenRepository.findCalendarTokenByToken(any()) } returns calendarTokenEntity
         every { roleRepository.findRoleEntityByName(any()) } returns roleEntityUser
         every { userRepository.save(any()) } returns userEntity
@@ -163,7 +164,7 @@ internal class AuthenticationServiceTest {
             imageHeight = userEntity.imageHeight, imageWidth = userEntity.imageWidth,
             imageSilhouette = userEntity.imageSilhouette
         )
-        every { userRepository.findAll() } returns listOf(user2)
+        every { userRepository.findByEmailIgnoreCase(any()) } returns user2
         every { calendarTokenRepository.findCalendarTokenByToken(any()) } returns calendarTokenEntity
         every { userRepository.save(any()) } returns userEntity
         every { emailService.sendSimpleMessage(any(), any(), any(), any()) } just Runs
@@ -192,7 +193,7 @@ internal class AuthenticationServiceTest {
 
     @Test
     fun testRegisterExistingUser() {
-        every { userRepository.findAll() } returns listOf(userEntity)
+        every { userRepository.findByEmailIgnoreCase(any()) } returns userEntity
         every { calendarTokenRepository.findCalendarTokenByToken(any()) } returns calendarTokenEntity
         val authenticationResponse = AtomicReference<AuthenticationResponse>()
         val thrown = assertThrows<RuntimeException> { authenticationResponse.set(testSubject.register(registerRequest)) }
@@ -205,7 +206,6 @@ internal class AuthenticationServiceTest {
 
     @Test
     fun testRegisterNoToken() {
-        every { userRepository.findAll() } returns listOf(userEntity)
         every { calendarTokenRepository.findCalendarTokenByToken(any()) } returns null
         val authenticationResponse = AtomicReference<AuthenticationResponse?>()
         val thrown = assertThrows<RuntimeException> { authenticationResponse.set(testSubject.register(registerRequest)) }
@@ -416,7 +416,7 @@ internal class AuthenticationServiceTest {
 
         every { userRepository.findByFacebookUserId(any()) } returns null
         every { userRepository.findByEmailIgnoreCase(any()) } returns null
-        every { userRepository.findAll() } returns listOf(userEntity)
+        every { userRepository.count() } returns 1L
         every { roleRepository.findRoleEntityByName(any()) } returns roleEntityUser
         every { userService.create(any()) } returns userMapper.entityToModel(userEntity)
 
@@ -450,7 +450,7 @@ internal class AuthenticationServiceTest {
     @Test
     fun testGoogleAuthenticateNewUser() {
         every { userRepository.findByEmailIgnoreCase(any()) } returns null
-        every { userRepository.findAll() } returns listOf()
+        every { userRepository.count() } returns 0L
         every { roleRepository.findRoleEntityByName(any()) } returns roleEntityUser
         every { userService.create(any()) } returns userMapper.entityToModel(userEntity)
 

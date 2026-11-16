@@ -30,6 +30,8 @@ data class UserWithoutChildren(
 ) {
     @Transient
     fun name(): String {
-        return listOfNotNull(firstName, middleName, lastName).joinToString { " " }
+        return listOfNotNull(firstName, middleName, lastName)
+            .filter(String::isNotBlank)
+            .joinToString(" ")
     }
 }

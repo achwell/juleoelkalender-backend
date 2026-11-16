@@ -18,13 +18,16 @@ import kotlin.jvm.optionals.getOrNull
 
 @Service
 class CalendarServiceImpl(
-    repository: CalendarRepository, private val userRepository: UserRepository,
+    private val calendarRepository: CalendarRepository, private val userRepository: UserRepository,
     private val beerMapper: BeerMapper, private val beerCalendarMapper: BeerCalendarMapper, mapper: CalendarMapper,
     private val calendarTokenMapper: CalendarTokenMapper
-) : BaseServiceImpl<UUID, Calendar, CalendarEntity>(repository, mapper), CalendarService {
+) : BaseServiceImpl<UUID, Calendar, CalendarEntity>(calendarRepository, mapper), CalendarService {
 
     override val all: Set<Calendar>
         get() = repository.findAll().map { mapper.entityToModel(it) }.toSet()
+
+    override fun countActiveCalendarsForYear(year: Int): Long =
+        calendarRepository.countByArchivedFalseAndYear(year)
 
     override fun getById(id: UUID): Calendar? {
         return repository.findById(id).map { mapper.entityToModel(it) }.getOrNull()

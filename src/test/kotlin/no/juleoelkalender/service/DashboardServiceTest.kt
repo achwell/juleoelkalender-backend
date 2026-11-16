@@ -3,12 +3,8 @@ package no.juleoelkalender.service
 import io.mockk.every
 import io.mockk.mockk
 import no.juleoelkalender.getBeer
-import no.juleoelkalender.getBeerWithCalendarAndDay
-import no.juleoelkalender.getCalendar
 import no.juleoelkalender.getUser
 import no.juleoelkalender.model.Beer
-import no.juleoelkalender.model.BeerWithCalendarAndDay
-import no.juleoelkalender.model.Calendar
 import no.juleoelkalender.model.User
 import no.juleoelkalender.service.impl.DashboardServiceImpl
 import org.junit.jupiter.api.Assertions.assertAll
@@ -16,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.actuate.info.InfoEndpoint
 import org.springframework.boot.health.actuate.endpoint.HealthEndpoint
 import org.springframework.boot.health.actuate.endpoint.IndicatedHealthDescriptor
@@ -44,16 +41,13 @@ internal class DashboardServiceTest {
     private val healthDescriptor = mockk<IndicatedHealthDescriptor>()
 
     private lateinit var beer: Beer
-    private lateinit var beerWithCalendarAndDay: BeerWithCalendarAndDay
-    private lateinit var calendar: Calendar
     private lateinit var user: User
 
     @BeforeEach
     fun setUp() {
         beer = getBeer()
-        beerWithCalendarAndDay = getBeerWithCalendarAndDay()
-        calendar = getCalendar()
         user = getUser()
+        healthIndicators.clear()
         testSubject = DashboardServiceImpl(healthIndicators, healthEndpoint, beerService, calendarService, deviceService, userService, infoEndpoint, metricsEndpoint)
     }
 
@@ -76,17 +70,29 @@ internal class DashboardServiceTest {
         every { metricDescriptor.measurements } returns listOf(sample)
         every { sample.value } returns 1.0
         every { deviceService.all } returns emptySet()
-        every { userService.all } returns setOf(user)
-        every { beerService.all } returns setOf(beer)
-        every { beerService.getBeersWithCalendar(null, null) } returns setOf(beerWithCalendarAndDay)
-        every { calendarService.all } returns setOf(calendar)
+        every { userService.getNewestUser() } returns user
+        every { userService.getNewestActiveUser() } returns user
+        every { userService.countUsers() } returns 1L
+        every { userService.countActiveUsers() } returns 1L
+        every { beerService.countActiveBeers() } returns 1L
+        every { beerService.getNewestActiveBeer() } returns beer
+        every { beerService.countPlacedBeersForYear(any()) } returns 1L
+        every { calendarService.countActiveCalendarsForYear(any()) } returns 1L
 
         val dashboardData = testSubject.dashboardData
         assertAll(
             { assertNotNull(dashboardData) },
             { assertEquals("1", dashboardData.backendVersion) },
             { assertNotNull(dashboardData.backendBuildTime) },
-            { assertEquals(now.year, dashboardData.backendBuildTime.year) }
+            { assertEquals(now.year, dashboardData.backendBuildTime.year) },
+            { assertEquals(1, dashboardData.numberOfUsers) },
+            { assertEquals(1, dashboardData.numberOfBeers) }
         )
+    }
+
+    @Test
+    fun testDashboardFailsClearlyWhenDiskHealthCheckIsMissing() {
+        every { infoEndpoint.info() } returns mutableMapOf()
+        assertThrows<IllegalStateException> { testSubject.dashboardData }
     }
 }

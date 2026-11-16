@@ -7,5 +7,5 @@ import java.util.UUID
 interface CalendarTokenRepository : JpaRepository<CalendarTokenEntity, UUID> {
     fun findCalendarTokenByToken(token: String): CalendarTokenEntity?
 
-    fun findAllByActive(active: Boolean): Collection<CalendarTokenEntity>
+    fun countByActiveTrueAndIdNot(id: UUID): Long
 }

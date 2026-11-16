@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import no.juleoelkalender.entity.CalendarTokenEntity
+import no.juleoelkalender.exception.ConflictException
 import no.juleoelkalender.getCalendarTokenEntity
 import no.juleoelkalender.mappers.CalendarTokenMapper
 import no.juleoelkalender.model.CalendarToken
@@ -18,9 +19,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.ZonedDateTime
 import java.util.Optional
-import java.util.UUID
 
 internal class CalendarTokenServiceTest {
     private val calendarTokenRepository = mockk<CalendarTokenRepository>()
@@ -95,19 +94,15 @@ internal class CalendarTokenServiceTest {
         val c = calendarTokenMapper.entityToModel(calendarTokenEntity)
         val calendarToken = CalendarToken(c.id, "UPDATED TOKEN", "UPDATED NAME", false)
         every { calendarTokenRepository.findById(any()) } returns Optional.of(calendarTokenEntity)
+        every { calendarTokenRepository.countByActiveTrueAndIdNot(calendarTokenEntity.id) } returns 0L
 
-        val thrown = assertThrows<RuntimeException> { testSubject.update(calendarTokenEntity.id, calendarToken) }
+        val thrown = assertThrows<ConflictException> { testSubject.update(calendarTokenEntity.id, calendarToken) }
         assertNotNull(thrown)
     }
 
     @Test
     fun testDeleteCalendarTokenExist() {
-        val now = ZonedDateTime.now()
-        every { calendarTokenRepository.findAllByActive(true) } returns listOf(
-            calendarTokenEntity, CalendarTokenEntity(
-                UUID.randomUUID(), "", "", true, mutableSetOf(), mutableSetOf(), now, now
-            )
-        )
+        every { calendarTokenRepository.countByActiveTrueAndIdNot(calendarTokenEntity.id) } returns 1L
         every { calendarTokenRepository.existsById(any()) } returns true
         every { calendarTokenRepository.deleteById(any()) } just Runs
 
@@ -117,12 +112,7 @@ internal class CalendarTokenServiceTest {
 
     @Test
     fun testDeleteCalendarTokenDontExist() {
-        val now = ZonedDateTime.now()
-        every { calendarTokenRepository.findAllByActive(true) } returns listOf(
-            calendarTokenEntity, CalendarTokenEntity(
-                UUID.randomUUID(), "", "", true, mutableSetOf(), mutableSetOf(), now, now
-            )
-        )
+        every { calendarTokenRepository.countByActiveTrueAndIdNot(calendarTokenEntity.id) } returns 1L
         every { calendarTokenRepository.existsById(any()) } returns false
         val deleted = testSubject.delete(calendarTokenEntity.id)
         assertFalse(deleted)
@@ -130,8 +120,8 @@ internal class CalendarTokenServiceTest {
 
     @Test
     fun testDeleteCalendarTokenLastActive() {
-        every { calendarTokenRepository.findAllByActive(true) } returns listOf(calendarTokenEntity)
-        val thrown = assertThrows<RuntimeException> { testSubject.delete(calendarTokenEntity.id) }
+        every { calendarTokenRepository.countByActiveTrueAndIdNot(calendarTokenEntity.id) } returns 0L
+        val thrown = assertThrows<ConflictException> { testSubject.delete(calendarTokenEntity.id) }
         assertNotNull(thrown)
     }
 }

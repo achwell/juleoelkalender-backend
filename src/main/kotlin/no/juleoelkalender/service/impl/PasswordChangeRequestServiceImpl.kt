@@ -14,16 +14,21 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Service
 class PasswordChangeRequestServiceImpl(
-    repository: PasswordChangeRequestRepository,
+    private val passwordChangeRequestRepository: PasswordChangeRequestRepository,
     private val emailService: EmailService, mapper: PasswordChangeRequestMapper, private val mailProperties: MailProperties,
     @param:Value("classpath:emails/forgottenPassword.html") private val forgottenPasswordEmail: Resource
-) : BaseServiceImpl<UUID, PasswordChangeRequest, PasswordChangeRequestEntity>(repository, mapper), PasswordChangeRequestService {
+) : BaseServiceImpl<UUID, PasswordChangeRequest, PasswordChangeRequestEntity>(passwordChangeRequestRepository, mapper), PasswordChangeRequestService {
+
+    @Transactional
+    override fun deleteExpiredBefore(cutoff: ZonedDateTime): Int =
+        passwordChangeRequestRepository.deleteExpiredBefore(cutoff)
 
     override fun preCreate(model: PasswordChangeRequest): PasswordChangeRequestEntity {
         val pcr = PasswordChangeRequest(
@@ -36,7 +41,7 @@ class PasswordChangeRequestServiceImpl(
             .replace($$"${base_url}", mailProperties.baseUrl!!)
             .replace($$"${email}", pcr.email)
             .replace($$"${token}", pcr.token)
-            .replace($$"${expires}", DateTimeFormatter.ofPattern("dd.MM.yyyy HH:SS").format(expires))
+            .replace($$"${expires}", DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(expires))
         try {
             emailService.sendSimpleMessage(
                 mailProperties.from!!, pcr.email,

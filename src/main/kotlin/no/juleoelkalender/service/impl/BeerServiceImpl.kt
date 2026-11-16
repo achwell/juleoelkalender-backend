@@ -10,6 +10,7 @@ import no.juleoelkalender.mappers.UserWithoutChildrenMapper
 import no.juleoelkalender.model.Beer
 import no.juleoelkalender.model.BeerWithCalendarAndDay
 import no.juleoelkalender.model.BeerWithCalendarDayAndReview
+import no.juleoelkalender.repository.BeerCalendarRepository
 import no.juleoelkalender.repository.BeerRepository
 import no.juleoelkalender.repository.BeerStyleRepository
 import no.juleoelkalender.repository.CalendarRepository
@@ -17,7 +18,6 @@ import no.juleoelkalender.repository.UserRepository
 import no.juleoelkalender.service.BeerService
 import no.juleoelkalender.service.LocalesService
 import no.juleoelkalender.utils.ExcelGenerator
-import org.apache.commons.lang3.StringUtils
 import org.springframework.security.authentication.InsufficientAuthenticationException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -31,6 +31,7 @@ import java.util.UUID
 @Service
 class BeerServiceImpl(
     private val beerRepository: BeerRepository,
+    private val beerCalendarRepository: BeerCalendarRepository,
     private val beerStyleRepository: BeerStyleRepository,
     private val calendarRepository: CalendarRepository,
     private val userRepository: UserRepository,
@@ -46,10 +47,11 @@ class BeerServiceImpl(
     override fun getBeersWithReviewByCalendarAndUser(calendarId: UUID, userId: UUID?): Set<BeerWithCalendarDayAndReview> {
         val calendarEntity = calendarRepository.getReferenceById(calendarId)
         val calendar = calendarMapper.entityToModel(calendarEntity)
-        val allReviews = calendarEntity.reviews.map { reviewMapper.entityToModel(it) }.toSet()
-
-        val reviewsByBeer = allReviews
+        val reviewsByBeer = calendarEntity.reviews
+            .asSequence()
             .filter { userId == null || it.user.id == userId }
+            .map(reviewMapper::entityToModel)
+            .toSet()
             .groupBy { it.beer.id }
 
         return calendarEntity.beerCalendars.map {
@@ -61,53 +63,34 @@ class BeerServiceImpl(
 
     override fun getBeersWithCalendar(calendarId: UUID?, email: String?): Set<BeerWithCalendarAndDay> {
         val currentUserEmail = SecurityContextHolder.getContext().authentication?.principal as String?
-        val retVal: MutableSet<BeerWithCalendarAndDay> = mutableSetOf()
-        var beers: Collection<BeerEntity>? = null
-        val calendarToken: CalendarTokenEntity?
-        if (StringUtils.isNotBlank(currentUserEmail)) {
-            val userEntity = userRepository.findByEmailIgnoreCase(currentUserEmail!!)
-            if (userEntity != null) {
-                calendarToken = userEntity.calendarToken.firstOrNull(CalendarTokenEntity::active)
-                if (calendarToken == null) {
-                    return mutableSetOf()
-                }
-            } else {
-                calendarToken = null
-            }
+        val calendarToken = currentUserEmail?.takeIf(String::isNotBlank)
+            ?.let(userRepository::findByEmailIgnoreCase)
+            ?.let { user -> getActiveToken(user.calendarToken) ?: return emptySet() }
+        val beers = if (!email.isNullOrBlank()) {
+            val userEntity = userRepository.findByEmailIgnoreCase(email) ?: return emptySet()
+            beerRepository.findBeerEntityByUser(userEntity)
         } else {
-            calendarToken = null
+            beerRepository.findAll()
         }
-        if (StringUtils.isNotBlank(email)) {
-            val userEntity = userRepository.findByEmailIgnoreCase(email!!)
-            if (userEntity != null) {
-                beers = beerRepository.findBeerEntityByUser(userEntity)
-            }
-        }
-        (beers ?: repository.findAll()).forEach { beer ->
+        return beers.flatMap { beer ->
             val beerCalendars = beer.beerCalendars.filter { beerCalendar ->
-                if (calendarId == null) {
-                    return@filter true
-                }
                 val calendar = beerCalendar.calendar
-                if (calendarToken != null && calendar.calendarToken.id != calendarToken.id) {
-                    return@filter false
-                }
-                calendar.id == calendarId
-            }.toSet()
+                calendarId == null ||
+                        (calendar.id == calendarId && (calendarToken == null || calendar.calendarToken.id == calendarToken.id))
+            }
             val user = beer.user
             val brewer = userWithoutChildrenMapper.entityToModel(user).let { model ->
                 model.copy(calendarToken = model.calendarToken.filter { it.active }.toSet())
             }
             val beerModel = mapper.entityToModel(beer).copy(brewer = brewer)
             if (beerCalendars.isEmpty()) {
-                retVal.add(BeerWithCalendarAndDay(beerModel, null, brewer, 0))
+                listOf(BeerWithCalendarAndDay(beerModel, null, brewer, 0))
             } else {
-                beerCalendars.forEach { beerCalendar ->
-                    retVal.add(BeerWithCalendarAndDay(beerModel, calendarMapper.entityToModel(beerCalendar.calendar), brewer, beerCalendar.day))
+                beerCalendars.map { beerCalendar ->
+                    BeerWithCalendarAndDay(beerModel, calendarMapper.entityToModel(beerCalendar.calendar), brewer, beerCalendar.day)
                 }
             }
-        }
-        return retVal
+        }.toSet()
     }
 
     override fun getBeersWithCalendarXlsx(calendarId: UUID?, email: String?, locale: String): ByteArray {
@@ -129,7 +112,7 @@ class BeerServiceImpl(
                 beer.brewer.name(),
                 beer.style,
                 beer.abv,
-                if (beer.archived) localesService.getString(locale, "common.no") else localesService.getString(locale, "common.yes"),
+                if (beer.archived) localesService.getString(locale, "common.yes") else localesService.getString(locale, "common.no"),
                 calendar?.year
                     ?: "",
                 calendar?.name
@@ -176,45 +159,43 @@ class BeerServiceImpl(
     }
 
     override fun getBeersWithCalendarAndReviewByDate(date: LocalDate): Set<BeerWithCalendarDayAndReview> {
-        val month = date.month
-        val beers: MutableSet<BeerWithCalendarDayAndReview> = mutableSetOf()
-        if (month == Month.DECEMBER) {
-            val email = SecurityContextHolder.getContext().authentication?.principal as String?
-            if (email != null) {
-                val user = userRepository.findByEmailIgnoreCase(email)
-                if (user != null) {
-                    val beerIds = user.beers.map(BeerEntity::id).toSet()
-                    val activeToken = getActiveToken(user.calendarToken)
-                    if (activeToken != null) {
-                        val year = date.year
-                        val day = date.dayOfMonth
-                        calendarRepository.findByCalendarToken(activeToken).filter { it.year == year }.forEach { calendarEntity ->
-                            val beerCalendars = calendarEntity.beerCalendars
-                            if (beerCalendars.any { bc -> beerIds.contains(bc.beer.id) }) {
-                                val beerCalendar = beerCalendars.firstOrNull { it.day == day }
-                                if (beerCalendar != null) {
-                                    val reviewEntity = beerCalendar.beer.reviews.firstOrNull { it.user.id == user.id && it.calendar.id == calendarEntity.id }
-                                        ?.let(reviewMapper::entityToModel)
-                                    beers.add(
-                                        BeerWithCalendarDayAndReview(
-                                            mapper.entityToModel(beerCalendar.beer),
-                                            calendarMapper.entityToModel(calendarEntity),
-                                            userWithoutChildrenMapper.entityToModel(beerCalendar.beer.user),
-                                            beerCalendar.day,
-                                            reviewEntity
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
+        if (date.month != Month.DECEMBER) return emptySet()
+
+        val email = SecurityContextHolder.getContext().authentication?.principal as? String? ?: return emptySet()
+        val user = userRepository.findByEmailIgnoreCase(email) ?: return emptySet()
+        val activeToken = getActiveToken(user.calendarToken) ?: return emptySet()
+        val beerIds = user.beers.map(BeerEntity::id).toSet()
+
+        return calendarRepository.findByCalendarToken(activeToken)
+            .asSequence()
+            .filter { calendar ->
+                calendar.year == date.year && calendar.beerCalendars.any { it.beer.id in beerIds }
+            }
+            .mapNotNull { calendar ->
+                calendar.beerCalendars.firstOrNull { it.day == date.dayOfMonth }?.let { beerCalendar ->
+                    val review = beerCalendar.beer.reviews.firstOrNull {
+                        it.user.id == user.id && it.calendar.id == calendar.id
+                    }?.let(reviewMapper::entityToModel)
+                    BeerWithCalendarDayAndReview(
+                        mapper.entityToModel(beerCalendar.beer),
+                        calendarMapper.entityToModel(calendar),
+                        userWithoutChildrenMapper.entityToModel(beerCalendar.beer.user),
+                        beerCalendar.day,
+                        review
+                    )
                 }
             }
-        }
-        return beers
+            .toSet()
     }
 
-    private fun getActiveToken(calendarToken: MutableSet<CalendarTokenEntity>): CalendarTokenEntity? {
+    override fun countActiveBeers(): Long = beerRepository.countByArchivedFalse()
+
+    override fun getNewestActiveBeer(): Beer? = beerRepository.findFirstByArchivedFalseOrderByCreatedDateDesc()
+        ?.let(mapper::entityToModel)
+
+    override fun countPlacedBeersForYear(year: Int): Long = beerCalendarRepository.countActiveBeerPlacementsForYear(year)
+
+    private fun getActiveToken(calendarToken: Set<CalendarTokenEntity>): CalendarTokenEntity? {
         return calendarToken.firstOrNull(CalendarTokenEntity::active)
     }
 

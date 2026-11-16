@@ -58,13 +58,11 @@ class AuthenticationServiceImpl(
     @Throws(MessagingException::class)
     override fun register(request: RegisterRequest): AuthenticationResponse {
         val now = ZonedDateTime.now()
-        val allUsers = userRepository.findAll()
-        val isFirstUser = allUsers.isEmpty()
-        val existingUser = allUsers.firstOrNull { it.email.equals(request.email, ignoreCase = true) }
         val calendarToken = requireCalendarToken(request.calendarToken)
+        val existingUser = userRepository.findByEmailIgnoreCase(request.email)
 
         val savedUser = existingUser?.let { addCalendarTokenToExistingUser(it, calendarToken) }
-            ?: createRegisteredUser(request, calendarToken, isFirstUser, now)
+            ?: createRegisteredUser(request, calendarToken, userRepository.count() == 0L, now)
 
         val user = toUserWithActiveTokens(savedUser)
         sendWelcomeEmail(user, now)
@@ -139,7 +137,7 @@ class AuthenticationServiceImpl(
 
     override fun addtoken(request: AddTokenRequest) {
         val userEntity = findUserByEmail(request.email)
-        val token = calendarTokenRepository.findCalendarTokenByToken(request.token)!!
+        val token = requireCalendarToken(request.token)
         userEntity.calendarToken.add(token)
         userRepository.save(userEntity)
     }
@@ -226,7 +224,7 @@ class AuthenticationServiceImpl(
     private fun requireRole(roleName: RoleNameEntity) = roleRepository.findRoleEntityByName(roleName)
         ?: throw NotFoundException("Role $roleName not found")
 
-    private fun isFirstUser(): Boolean = userRepository.findAll().isEmpty()
+    private fun isFirstUser(): Boolean = userRepository.count() == 0L
 
     private fun requireActiveCalendarToken(userEntity: UserEntity) {
         if (userEntity.calendarToken.none { it.active }) {
